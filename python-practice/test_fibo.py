@@ -6,8 +6,3 @@ for i, correct in enumerate(correct_fibonacci_seq):
 	assert fibo_iter(i) == correct
 	assert fibo_tail(i) == correct
 	assert fibo_recur(i) == correct
-
-#print(fibo_recur(6)) 
-#print(fibo_memo(6))
-#print(fibo_iter(6))
-#print(fibo_tail(6))

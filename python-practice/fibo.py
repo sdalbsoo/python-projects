@@ -17,18 +17,17 @@ def fibo_tail(n, a=0, b=1):
         return b
     return fibo_tail(n - 1, b, a + b);
 
-
 ## Iterative
 def fibo_iter(n):
-    a, b = 0, 1
+    prev, next_ = 0, 1
     for i in range(n):
-        a, b = b, a+b
-    return a
+        prev, next_= next_, prev+next_
+    return prev
 
 ## Memoization & Dynamic Programming
 def fibo_memo(n):
     list_nums = [0, 1]
     for i in range(n-1):
-        a = list_nums[i] + list_nums[i+1]
-        list_nums.append(a)
+        next_val = list_nums[i] + list_nums[i+1]
+        list_nums.append(next_val)
     return list_nums[n]
