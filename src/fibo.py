@@ -16,14 +16,14 @@ def fibo_tail(n, a=0, b=1):
         return a
     if n == 1:
         return b
-    return fibo_tail(n - 1, b, a + b);
+    return fibo_tail(n - 1, b, a + b)
 
 
 def fibo_iter(n):
     # Iterative
     prev, next_ = 0, 1
     for i in range(n):
-        prev, next_= next_, prev+next_
+        prev, next_ = next_, (prev + next_)
     return prev
 
 
