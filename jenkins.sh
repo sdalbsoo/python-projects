@@ -1,4 +1,5 @@
-# Check pycodestyle based on hpcnt-ml/.flake8
+#!/bin/bash
+
 function run_flake8() {
     flake8
     is_flake8_pass=$?
@@ -17,6 +18,6 @@ function run_pytest() {
     fi
 }
 
-
+pip install -r requirements.txt
 run_flake8
 run_pytest
