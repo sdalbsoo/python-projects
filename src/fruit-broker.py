@@ -30,23 +30,26 @@ class FruitBuyer(object):
         return "FruitBuyer : 받은 사과:{}, 남은 돈:{}, 받은 거스름돈:{}>".format(self.num_apples, self.money, self.change)  # noqa
 
 
-seller1 = FruitSeller(30, 3000)  # seller1은 사과 30개 보유 및 3000원에 판매 중
-print(seller1)  # 사과 보유량 확인.
+class FruitBroker(object):
+    def __init__(self, seller):
+       self.money = 0
+        
+    def choice_cheap_apple(self, seller):
+        sorted(seller, key = lambda x: x[1])
+        return seller[0]
+        
+
+
+
+seller_list = [
+    FruitSeller(30, 3000), FruitSeller(50, 2000), FruitSeller(70, 1000)
+]
 
 buyer1 = FruitBuyer(50000)  # buyer1은 5만원 보유 중
-buyer1.buy_apple(seller1, 5000)  # 구매자가 5천원어치 사과를 주문
-print(buyer1, seller1)  # 구매자와 판매자의 상황 출력
-buyer1.buy_apple(seller1, 6000)  # 구매자가 6천원어치 사과를 주문
-print(buyer1, seller1)  # 구매자와 판매자의 상황 출력
-buyer1.buy_apple(seller1, 7000)  # 구매자가 7천원어치 사과를 주문
-print(buyer1, seller1)  # 구매자와 판매자의 상황 출력
-print('-------------------------------------------')
-print('-------------------------------------------')
+broker = FruitBroker(seller)  # 브로커가 판매자1,2,3중 가장 싼 사과 선택
+print(broker.choice_cheap_apple(seller))
 
-seller2 = FruitSeller(50, 2000)
-print(seller2)
-buyer2 = FruitBuyer(50000)
-buyer2.buy_apple(seller2, 7000)
-print(buyer2, seller2)
-buyer2.buy_apple(seller2, 9000)
-print(buyer2, seller2)
+buyer1.buy_apple(seller1, 6000)  # 구매자가 6천원어치 사과를 주문
+buyer1.buy_apple(seller1, 7000)  # 구매자가 7천원어치 사과를 주문
+print('-------------------------------------------')
+print('-------------------------------------------')
