@@ -10,6 +10,7 @@ class Watcher():
         self.url = url
         self.data = json.dumps({"text": f"{self.url}" + text})
         self.last_content = None
+        self.text = text
 
     def check(self):
         resp = requests.get(self.url)
