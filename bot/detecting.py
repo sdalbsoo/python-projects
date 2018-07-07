@@ -31,8 +31,8 @@ class Watcher():
 
 watch_list = [
     # Watcher(url="http://localhost:8000", text="공지가 업데이트됐습니다."),  # noqa
-    Watcher(url="http://cse.kongju.ac.kr/community/notice.asp", text="공지가 업데이트됐습니다."),  # noqa
-    Watcher(url="http://ie.snu.ac.kr/ko/board/7", text="공지가 업데이트됐습니다."),
+    Watcher(url="http://cse.kongju.ac.kr/community/notice.asp", text=" 공지가 업데이트됐습니다."),  # noqa
+    # Watcher(url="http://ie.snu.ac.kr/ko/board/7", text="공지가 업데이트됐습니다."),
     # Watcher(url="http://onenable.tumblr.com/OnePiece", text="원피스 최신화가 업데이트됐습니다."),   # noqa
 ]
 
