@@ -19,6 +19,7 @@ class Watcher():
             self.last_content = resp.content
             print(f"[{self.url}] Start monitoring!")
         elif self.last_content != resp.content:
+            # TODO refactor this slack message
             requests.post(
                 Watcher.slack_url,
                 data=self.data,
