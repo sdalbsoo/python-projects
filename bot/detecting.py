@@ -13,6 +13,7 @@ colormap = {
 
 class Watcher():
     slack_url = "https://hooks.slack.com/services/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"  # noqa
+
     def __init__(self, url, pretext, text, title, title_link, color):
         self.url = url
         self._data = {"text": f"[{self.url}] {text}"}
@@ -24,7 +25,7 @@ class Watcher():
                      "title": title,
                      "title_link": title_link,
                      "text": text,
-                     "color": color }
+                     "color": color}
                 ]
             }
         )
@@ -33,7 +34,9 @@ class Watcher():
 
     def check(self):
         resp = requests.get(self.url)
-        parsed_content = self.parse(resp)
+        source = resp.text
+        soup = BeautifulSoup(source, 'lxml')
+        parsed_content = self.parse(soup)
         if self.last_content is None:
             self.last_content = parsed_content
             print(f"[{self.url}] Start monitoring!")
@@ -49,34 +52,69 @@ class Watcher():
         else:
             print(f"[{self.url}] Nothing changed!")
 
+    def main(watch_list):
+        while 1:
+            for watch in watch_list:
+                watch.check()
+            time.sleep(21600)
+
+
 class SnuWatcher(Watcher):
-    def parse(self, resp):
-        source_snu = resp.text
-        soup_snu = BeautifulSoup(source_snu, 'lxml')
-        content_ = soup_snu.find('section')
-        temp = content_.findAll('td', class_='views-field views-field-title-field')  # noqa
-        snu_content = [v.find('a').text for v in temp]
-        parsed = snu_content
+    def __init__(self, url, pretext, text, title, title_link, color):
+        super(SnuWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+
+    def parse(self, soup):
+        content = soup.find('section')
+        temp = content.findAll('td', class_='views-field views-field-title-field')  # noqa
+        parsed = [v.find('a').text for v in temp]
         return parsed
 
+
 class LocalWatcher(Watcher):
-    def parse(self, resp):
-        source_local = resp.text
-        soup_local = BeautifulSoup(source_local, 'lxml')
-        local_content = soup_local.find('ul')
-        parsed = local_content
+    def __init__(self, url, pretext, text, title, title_link, color):
+        super(LocalWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+
+    def parse(self, soup):
+        content = soup.find('ul')
+        parsed = content
+        return parsed
+
+
+class OnePieceWatcher(Watcher):
+    def __init__(self, url, pretext, text, title, title_link, color):
+        super(OnePieceWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+
+    def parse(self, soup):
+        content = soup.find('a')
+        parsed = content
+        return parsed
+
+
+class KongjuWatcher(Watcher):
+    def __init__(self, url, pretext, text, title, title_link, color):
+        super(KongjuWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+
+    def parse(self, soup):
+        content = soup.findAll('td', class_='lmcNotice')
+        parsed = content
         return parsed
 
 
 watch_list = [
     LocalWatcher(url="http://localhost:8000",
                  pretext=f"@sdalbsoo님! 확인 바랍니다.",
-                 text="공지가 업데이트됐습니다.",
+                 text="컴퓨터가 업데이트됐습니다.",
                  title="local watch!",
                  title_link="http://localhost:8000",
                  color=colormap["sky"],
-                 ),  # noqa
-    # Watcher(url="http://cse.kongju.ac.kr/community/notice.asp", text="공지가 업데이트됐습니다.",),  # noqa
+                 ),
+    KongjuWatcher(url="http://cse.kongju.ac.kr/community/notice.asp",
+                  pretext=f"@sdalbsoo님! 확인바랍니다.",
+                  text="공지가 업데이트됐습니다.",
+                  title="공주대 공지!",
+                  title_link="http://cse.kongju.ac.kr/community/notice.asp",
+                  color=colormap["sky"],
+                  ),
     SnuWatcher(url="http://ie.snu.ac.kr/ko/board/7",
                pretext=f"@sharsta님! 확인 바랍니다.",
                text="공지가 업데이트됐습니다.",
@@ -84,10 +122,13 @@ watch_list = [
                title_link="http://ie.snu.ac.kr/ko/board/7",
                color=colormap["sky"],
                ),
-    # Watcher(url="http://onenable.tumblr.com/OnePiece", text="원피스 최신화가 업데이트됐습니다."),   # noqa
+    OnePieceWatcher(url="http://onenable.tumblr.com/OnePiece",
+                    pretext=f"확인 바랍니다.",
+                    text="원피스 최신화가 업데이트됐습니다.",
+                    title="원피스 최신화!",
+                    title_link="http://onenable.tumblr.com/OnePiece",
+                    color=colormap["blue"],
+                    ),
 ]
-
-while 1:
-    for watch in watch_list:
-        watch.check()
-    time.sleep(10800)
+if __name__ == "__main__":
+    Watcher.main(watch_list)
