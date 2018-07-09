@@ -42,7 +42,7 @@ params = {
 class SlackMessage():
     def __init__(self, url=None):
         if url is None:
-            self.url = "https://hooks.slack.com/services/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"  # noqa
+            self.url = "https://hooks.slack.com/services/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"  # noqa
         else:
             self.url = url
 
@@ -119,5 +119,5 @@ for watch in watch_list:
         else:
             slack.send(title=f"[{pr_title}]({pr_url})",
                        color=colormap["blue"],
-                       text=f"0개의 리뷰가 리뷰 대기 중입니다.")  # noqa
+                       text=f"0개의 PR이 리뷰 대기 중입니다.")  # noqa
             print(f"아직 리뷰어를 요청하지 않았습니다.")
