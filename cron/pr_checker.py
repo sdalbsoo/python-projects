@@ -42,7 +42,7 @@ params = {
 class SlackMessage():
     def __init__(self, url=None):
         if url is None:
-            self.url = "https://hooks.slack.com/services/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"  # noqa
+            self.url = "https://hooks.slack.com/services/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"  # noqa
         else:
             self.url = url
 

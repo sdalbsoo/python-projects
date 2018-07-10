@@ -4,7 +4,7 @@ import json
 
 
 class Watcher():
-    slack_url = "https://hooks.slack.com/services/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"  # noqa
+    slack_url = "https://hooks.slack.com/services/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"  # noqa
 
     def __init__(self, url, text):
         self.url = url
