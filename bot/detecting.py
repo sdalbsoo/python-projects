@@ -100,13 +100,13 @@ class KongjuWatcher(Watcher):
 
 def main():
     watch_list = [
-        LocalWatcher(url="http://localhost:8000",
-                     pretext=f"@sdalbsoo님! 확인 바랍니다.",
-                     text="컴퓨터가 업데이트됐습니다.",
-                     title="local watch!",
-                     title_link="http://localhost:8000",
-                     color=colormap["sky"]
-                     ),
+#        LocalWatcher(url="http://localhost:8000",
+#                     pretext=f"@sdalbsoo님! 확인 바랍니다.",
+#                     text="컴퓨터가 업데이트됐습니다.",
+#                     title="local watch!",
+#                     title_link="http://localhost:8000",
+#                     color=colormap["sky"]
+#                     ),
         KongjuWatcher(url="http://cse.kongju.ac.kr/community/notice.asp",
                       pretext=f"@sdalbsoo님! 확인바랍니다.",
                       text="공지가 업데이트됐습니다.",
@@ -115,7 +115,7 @@ def main():
                       color=colormap["sky"]
                       ),
         SnuWatcher(url="http://ie.snu.ac.kr/ko/board/7",
-                   pretext=f"@sharsta님! 확인 바랍니다.",
+                   pretext=f"@shasta님! 확인 바랍니다.",
                    text="공지가 업데이트됐습니다.",
                    title="서울대 공지!",
                    title_link="http://ie.snu.ac.kr/ko/board/7",
