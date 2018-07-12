@@ -1,7 +1,11 @@
+import time
+
 from bs4 import BeautifulSoup
 import requests
-import time
+
 from common.slack import SlackMessage
+from common.slack import NotiTemplate
+
 
 colormap = {
     "red": "#C70039",
@@ -12,15 +16,12 @@ colormap = {
 
 
 class Watcher():
-    def __init__(self, url, pretext, text, title, title_link, color):
-        self.slack_msg = SlackMessage()
-        self.last_content = None
+    def __init__(self, url, template):
         self.url = url
-        self.pretext = pretext
-        self.text = text
-        self.title = title
-        self.title_link = title_link
-        self.color = color
+        self.slack_msg = SlackMessage()
+        self.template = template
+
+        self.last_content = None
 
     def check(self):
         try:
@@ -32,12 +33,7 @@ class Watcher():
                 self.last_content = parsed_content
                 print(f"[{self.url}] Start monitoring!")
             elif self.last_content != parsed_content:
-                self.slack_msg.send(self.url,
-                                    self.pretext,
-                                    self.text,
-                                    self.title,
-                                    self.title_link,
-                                    self.color)
+                self.slack_msg.send(self.template)
                 self.last_content = parsed_content
             else:
                 print(f"[{self.url}] Nothing changed!")
@@ -46,8 +42,8 @@ class Watcher():
 
 
 class SnuWatcher(Watcher):
-    def __init__(self, url, pretext, text, title, title_link, color):
-        super(SnuWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+    def __init__(self, url, template):
+        super(SnuWatcher, self).__init__(url, template)  # noqa
 
     def parse(self, soup):
         content = soup.find('section')
@@ -57,8 +53,8 @@ class SnuWatcher(Watcher):
 
 
 class LocalWatcher(Watcher):
-    def __init__(self, url, pretext, text, title, title_link, color):
-        super(LocalWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+    def __init__(self, url, template):
+        super(LocalWatcher, self).__init__(url, template)  # noqa
 
     def parse(self, soup):
         content = soup.find('ul')
@@ -67,8 +63,8 @@ class LocalWatcher(Watcher):
 
 
 class OnePieceWatcher(Watcher):
-    def __init__(self, url, pretext, text, title, title_link, color):
-        super(OnePieceWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+    def __init__(self, url, template):
+        super(OnePieceWatcher, self).__init__(url, template)  # noqa
 
     def parse(self, soup):
         content = soup.findAll('a')
@@ -77,8 +73,8 @@ class OnePieceWatcher(Watcher):
 
 
 class KongjuWatcher(Watcher):
-    def __init__(self, url, pretext, text, title, title_link, color):
-        super(KongjuWatcher, self).__init__(url, pretext, text, title, title_link, color)  # noqa
+    def __init__(self, url, template):
+        super(KongjuWatcher, self).__init__(url, template)  # noqa
 
     def parse(self, soup):
         content = soup.findAll('td', class_='lmcNotice')
@@ -88,39 +84,51 @@ class KongjuWatcher(Watcher):
 
 def main():
     watch_list = [
-        LocalWatcher(url="http://localhost:8000",
-                     pretext=f"@sdalbsoo님! 확인 바랍니다.",
-                     text="컴퓨터가 업데이트됐습니다.",
-                     title="local watch!",
-                     title_link="http://localhost:8000",
-                     color=colormap["sky"]
-                     ),
-         KongjuWatcher(url="http://cse.kongju.ac.kr/community/notice.asp",
-                      pretext=f"@sdalbsoo님! 확인바랍니다.",
-                      text="공지가 업데이트됐습니다.",
-                      title="공주대 공지!",
-                      title_link="http://cse.kongju.ac.kr/community/notice.asp",  # noqa
-                      color=colormap["sky"]
-                      ),
-        SnuWatcher(url="http://ie.snu.ac.kr/ko/board/7",
-                   pretext=f"@shasta님! 확인 바랍니다.",
-                   text="공지가 업데이트됐습니다.",
-                   title="서울대 공지!",
-                   title_link="http://ie.snu.ac.kr/ko/board/7",
-                   color=colormap["sky"]
-                   ),
-        OnePieceWatcher(url="http://onenable.tumblr.com/OnePiece",
-                        pretext=f"확인 바랍니다.",
-                        text="원피스 최신화가 업데이트됐습니다.",
-                        title="원피스 최신화!",
-                        title_link="http://onenable.tumblr.com/OnePiece",
-                        color=colormap["yellow"]
-                        ),
+        LocalWatcher(
+            url="http://localhost:8000",
+            template=NotiTemplate(
+                pretext=f"@sdalbsoo님! 확인 바랍니다.",
+                text="컴퓨터가 업데이트됐습니다.",
+                title="local watch!",
+                title_link="http://localhost:8000",
+                color=colormap["sky"],
+            )
+        ),
+        # KongjuWatcher(
+            # url="http://cse.kongju.ac.kr/community/notice.asp",
+            # template=NotiTemplate(
+                # pretext=f"@sdalbsoo님! 확인바랍니다.",
+                # text="공지가 업데이트됐습니다.",
+                # title="공주대 공지!",
+                # title_link="http://cse.kongju.ac.kr/community/notice.asp",  # noqa
+                # color=colormap["sky"],
+            # )
+        # ),
+        # SnuWatcher(
+            # url="http://ie.snu.ac.kr/ko/board/7",
+            # template=NotiTemplate(
+                # pretext=f"@shasta님! 확인 바랍니다.",
+                # text="공지가 업데이트됐습니다.",
+                # title="서울대 공지!",
+                # title_link="http://ie.snu.ac.kr/ko/board/7",
+                # color=colormap["sky"],
+            # ),
+        # ),
+        # OnePieceWatcher(
+            # url="http://onenable.tumblr.com/OnePiece",
+            # template=NotiTemplate(
+                # pretext=f"확인 바랍니다.",
+                # text="원피스 최신화가 업데이트됐습니다.",
+                # title="원피스 최신화!",
+                # title_link="http://onenable.tumblr.com/OnePiece",
+                # color=colormap["yellow"],
+            # )
+        # ),
     ]
     while 1:
         for watch in watch_list:
             watch.check()
-        time.sleep(21600)
+        time.sleep(2)
 
 
 if __name__ == "__main__":
