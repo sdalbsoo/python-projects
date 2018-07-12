@@ -18,7 +18,7 @@ class SlackMessage():
                     {"pretext": pretext,
                      "text": text,
                      "title": title,
-                     "title": title_link,
+                     "title_link": title_link,
                      "color": color,
                      }
                 ]
