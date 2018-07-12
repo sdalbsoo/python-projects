@@ -5,6 +5,7 @@ import requests
 
 from common.slack import SlackMessage
 from common.slack import NotiTemplate
+from common.utils import get_logger
 
 
 colormap = {
@@ -19,6 +20,7 @@ class Watcher():
     def __init__(self, url, template):
         self.url = url
         self.slack_msg = SlackMessage()
+        self.log = get_logger(__name__)
         self.template = template
 
         self.last_content = None
@@ -31,14 +33,14 @@ class Watcher():
             parsed_content = self.parse(soup)
             if self.last_content is None:
                 self.last_content = parsed_content
-                print(f"[{self.url}] Start monitoring!")
+                self.log.info(f"[{self.url}] Start monitoring!")
             elif self.last_content != parsed_content:
                 self.slack_msg.send(self.template)
                 self.last_content = parsed_content
             else:
-                print(f"[{self.url}] Nothing changed!")
+                self.log.info(f"[{self.url}] Nothing changed!")
         except requests.exceptions.ConnectionError:
-            print(f"[{self.url}] 연결이 끊겼습니다.")
+            self.log.info(f"[{self.url}] 연결이 끊겼습니다.")
 
 
 class SnuWatcher(Watcher):

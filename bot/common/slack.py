@@ -4,17 +4,22 @@ import json
 
 import requests
 
+from common.utils import get_logger
+
 
 class SlackMessage():
     slack_url = "https://hooks.slack.com/services/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"  # noqa
+    def __init__(self):
+        self.log = get_logger(__name__)
 
     def send(self, template):
-        requests.post(
+        resp = requests.post(
             SlackMessage.slack_url,
             data=template.data,
             headers={"Content-type": "application/json"}
         )
-        print("메세지가 보내졌습니다!\n"+str(template))
+        self.log.debug(f"슬랙 메세지 Response: {resp.content}")
+        self.log.info("메세지가 보내졌습니다!\n"+str(template))
 
 
 class SlackMessageTemplate(ABC):
@@ -44,9 +49,11 @@ class NotiTemplate(SlackMessageTemplate):
         return self._data
 
     def __str__(self):
-        msg = f"{self._data_dict['attachments'][0]['pretext']}\n"
+        msg = "=" * 44 + "\n"
+        msg += f"{self._data_dict['attachments'][0]['pretext']}\n"
         msg += f"| {self._data_dict['attachments'][0]['title']}({self._data_dict['attachments'][0]['title_link']})\n"  # noqa
-        msg += f"| {self._data_dict['attachments'][0]['text']}"
+        msg += f"| {self._data_dict['attachments'][0]['text']}\n"
+        msg += "=" * 44
         return msg
 
     def __repr__(self):
