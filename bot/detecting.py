@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import json
+from common.slack import SlackMessage
 
 colormap = {
     "red": "#C70039",
@@ -12,26 +13,15 @@ colormap = {
 
 
 class Watcher():
-    slack_url = "https://hooks.slack.com/services/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"  # noqa
-
     def __init__(self, url, pretext, text, title, title_link, color):
-        self.url = url
-        self._data = {"text": f"[{self.url}] {text}"}
-        self.data = json.dumps(
-            {
-                "attachments":
-                [
-                    {"pretext": pretext,
-                     "title": title,
-                     "title_link": title_link,
-                     "text": text,
-                     "color": color,
-                     }
-                ]
-            }
-        )
+        self.slack_msg = SlackMessage(url, pretext, text, title, title_link, color)  # noqa
         self.last_content = None
+        self.url = url
+        self.pretext = pretext
         self.text = text
+        self.title = title
+        self.title_link = title_link
+        self.color = color
 
     def check(self):
         try:
@@ -43,14 +33,8 @@ class Watcher():
                 self.last_content = parsed_content
                 print(f"[{self.url}] Start monitoring!")
             elif self.last_content != parsed_content:
-                # TODO refactor this slack message
-                requests.post(
-                    Watcher.slack_url,
-                    data=self.data,
-                    headers={"Content-type": "application/json"}
-                    )
+                self.slack_msg.send()
                 self.last_content = parsed_content
-                print(f"{self._data}")
             else:
                 print(f"[{self.url}] Nothing changed!")
         except requests.exceptions.ConnectionError:
@@ -100,14 +84,14 @@ class KongjuWatcher(Watcher):
 
 def main():
     watch_list = [
-#        LocalWatcher(url="http://localhost:8000",
-#                     pretext=f"@sdalbsoo님! 확인 바랍니다.",
-#                     text="컴퓨터가 업데이트됐습니다.",
-#                     title="local watch!",
-#                     title_link="http://localhost:8000",
-#                     color=colormap["sky"]
-#                     ),
-        KongjuWatcher(url="http://cse.kongju.ac.kr/community/notice.asp",
+        LocalWatcher(url="http://localhost:8000",
+                     pretext=f"@sdalbsoo님! 확인 바랍니다.",
+                     text="컴퓨터가 업데이트됐습니다.",
+                     title="local watch!",
+                     title_link="http://localhost:8000",
+                     color=colormap["sky"]
+                     ),
+         KongjuWatcher(url="http://cse.kongju.ac.kr/community/notice.asp",
                       pretext=f"@sdalbsoo님! 확인바랍니다.",
                       text="공지가 업데이트됐습니다.",
                       title="공주대 공지!",
