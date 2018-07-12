@@ -13,7 +13,7 @@ colormap = {
 
 class Watcher():
     def __init__(self, url, pretext, text, title, title_link, color):
-        self.slack_msg = SlackMessage(url, pretext, text, title, title_link, color)  # noqa
+        self.slack_msg = SlackMessage()
         self.last_content = None
         self.url = url
         self.pretext = pretext
@@ -32,7 +32,12 @@ class Watcher():
                 self.last_content = parsed_content
                 print(f"[{self.url}] Start monitoring!")
             elif self.last_content != parsed_content:
-                self.slack_msg.send()
+                self.slack_msg.send(self.url,
+                                    self.pretext,
+                                    self.text,
+                                    self.title,
+                                    self.title_link,
+                                    self.color)
                 self.last_content = parsed_content
             else:
                 print(f"[{self.url}] Nothing changed!")
