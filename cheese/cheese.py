@@ -1,7 +1,7 @@
 import re
 
 
-class Subtitle():
+class SubtitleParser():
     def __init__(self):
         with open("../data/srt/stopwords.txt", "r") as f:
             self.stopwords = set(f.read().split('\n'))
@@ -14,13 +14,13 @@ class Subtitle():
         return match.groups()[0]
 
 
-class Srt(Subtitle):
+class SrtParser(SubtitleParser):
     def __init__(self, srt_path):
-        super(Srt, self).__init__()
+        super(SrtParser, self).__init__()
         with open(srt_path, 'r') as f:
             self.lines = f.read().splitlines()
 
-    def extract_sentence(self):
+    def extract_sentences(self):
         sentences = []
         for line in self.lines:
             if line.isdigit():
@@ -35,29 +35,22 @@ class Srt(Subtitle):
 
     def extract_words(self, sentences):
         words = {}
-        temp_list = []
         for sentence in sentences:
             for word in sentence.split(' '):
                 if word not in self.stopwords:
                     words[word] = words.get(word, 0) + 1
-        print(type(self.stopwords))
-        print(self.stopwords)
-        print(type(word))
-        print(words)
         return words
 
-    def __str__(self):
-        return ()
 
-class Smi():
+class SmiParser():
     def __init__(self):
         pass
 
 
 def main():
     srt_path = "../data/srt/lionking.srt"
-    srt = Srt(srt_path)
-    sentences = srt.extract_sentence()
+    srt = SrtParser(srt_path)
+    sentences = srt.extract_sentences()
     srt.extract_words(sentences)
 
 
