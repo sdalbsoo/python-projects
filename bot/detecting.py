@@ -14,6 +14,14 @@ colormap = {
     "sky": "#2ECCFA",
 }
 
+<<<<<<< HEAD
+||||||| merged common ancestors
+class Watcher():
+    slack_url = "https://hooks.slack.com/services/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"  # noqa
+=======
+class Watcher():
+    slack_url = "https://hooks.slack.com/services/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"  # noqa
+>>>>>>> master
 
 class Watcher():
     def __init__(self, url, template):
