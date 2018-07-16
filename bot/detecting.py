@@ -5,6 +5,7 @@ import requests
 
 from common.slack import SlackMessage
 from common.slack import NotiTemplate
+from common.utils import get_logger
 
 
 colormap = {
@@ -20,6 +21,7 @@ class Watcher():
         self.url = url
         self.slack_msg = SlackMessage()
         self.template = template
+        self.mylogger = get_logger(__name__)
 
         self.last_content = None
 
@@ -31,15 +33,15 @@ class Watcher():
             parsed_content = self.parse(soup)
             if self.last_content is None:
                 self.last_content = parsed_content
-                print(f"[{self.url}] Start monitoring!")
+                self.mylogger.info(f"[{self.url}] Start Monitoring!")
             elif self.last_content != parsed_content:
                 self.slack_msg.send(self.template)
                 self.last_content = parsed_content
-                print("변화생김")
+                self.mylogger.info(f"[{self.url}] something changed!")
             else:
-                print(f"[{self.url}] Nothing changed!")
+                self.mylogger.info(f"[{self.url}] Nothing changed!")
         except requests.exceptions.ConnectionError:
-            print(f"[{self.url}] 연결이 끊겼습니다.")
+            self.mylogger.info(f"[{self.url}] Disconnecting!")
 
 
 class SnuWatcher(Watcher):

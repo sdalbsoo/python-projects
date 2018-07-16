@@ -4,16 +4,21 @@ from abc import abstractmethod
 
 import requests
 
+from common.utils import get_logger
+
 
 class SlackMessage():
     slack_url = "https://hooks.slack.com/services/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"  # noqa
+    def __init__(self):
+        self.log = get_logger(__name__)
 
     def send(self, template):
-        requests.post(
+       resp = requests.post(
             SlackMessage.slack_url,
             data=template.data,
             headers={"Content-type": "application/json"}
         )
+       self.log.info(f"slack message response: {resp.content}")
 
 
 class SlackMessageTemplate(ABC):
