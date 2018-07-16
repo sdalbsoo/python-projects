@@ -21,7 +21,7 @@ class Watcher():
         self.url = url
         self.slack_msg = SlackMessage()
         self.template = template
-        self.mylogger = get_logger(__name__)
+        self.log = get_logger(__name__)
 
         self.last_content = None
 
@@ -33,15 +33,15 @@ class Watcher():
             parsed_content = self.parse(soup)
             if self.last_content is None:
                 self.last_content = parsed_content
-                self.mylogger.info(f"[{self.url}] Start Monitoring!")
+                self.log.info(f"[{self.url}] Start Monitoring!")
             elif self.last_content != parsed_content:
                 self.slack_msg.send(self.template)
                 self.last_content = parsed_content
-                self.mylogger.info(f"[{self.url}] something changed!")
+                self.log.info(f"[{self.url}] something changed!")
             else:
-                self.mylogger.info(f"[{self.url}] Nothing changed!")
+                self.log.info(f"[{self.url}] Nothing changed!")
         except requests.exceptions.ConnectionError:
-            self.mylogger.info(f"[{self.url}] Disconnecting!")
+            self.log.info(f"[{self.url}] Disconnecting!")
 
 
 class SnuWatcher(Watcher):

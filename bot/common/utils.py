@@ -7,8 +7,7 @@ def get_logger(name):
     logger = logging.getLogger(name)
 
     if not logger.hasHandlers():
-        formatter1 = logging.Formatter("[%(levelname)s|%(filename)s:%(lineno)s] %(asctime)s > %(message)s")  # noqa
-        formatter2 = logging.Formatter("[%(asctime)s - %(name)s - %(levelname)s] - %(message)s")
+        formatter = logging.Formatter("[%(levelname)s|%(filename)s:%(lineno)s] %(asctime)s > %(message)s")  # noqa
 
         logger.setLevel(getattr(logging, os.environ.get("LOG_LEVEL", "INFO")))
 
@@ -20,7 +19,7 @@ def get_logger(name):
             # logger.addHandler(fileHandler)
 
         streamHandler = logging.StreamHandler()
-        streamHandler.setFormatter(formatter2)
+        streamHandler.setFormatter(formatter)
         logger.addHandler(streamHandler)
 
     return logger
