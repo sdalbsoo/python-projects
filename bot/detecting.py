@@ -6,6 +6,7 @@ import requests
 from common.slack import SlackMessage
 from common.slack import NotiTemplate
 
+
 colormap = {
     "red": "#C70039",
     "blue": "#334FFF",
