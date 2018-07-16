@@ -9,7 +9,7 @@ class SlackMessage():
     slack_url = "https://hooks.slack.com/services/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"  # noqa
 
     def send(self, template):
-        resp = requests.post(
+        requests.post(
             SlackMessage.slack_url,
             data=template.data,
             headers={"Content-type": "application/json"}

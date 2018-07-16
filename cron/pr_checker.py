@@ -119,11 +119,5 @@ for watch in watch_list:
         else:
             slack.send(title=f"[{pr_title}]({pr_url})",
                        color=colormap["blue"],
-<<<<<<< HEAD
                        text=f"0개의 PR이 리뷰 대기 중입니다.")  # noqa
-||||||| merged common ancestors
-                       text=f"0개의 리뷰가 리뷰 대기 중입니다.")  # noqa
-=======
-                    text=f"0개의 PR이 리뷰 대기 중입니다.")  # noqa
->>>>>>> master
             print(f"아직 리뷰어를 요청하지 않았습니다.")
