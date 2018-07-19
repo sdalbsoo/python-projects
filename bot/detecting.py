@@ -25,7 +25,7 @@ class Watcher():
 
         self.last_content = None
 
-    def check(self):
+    def checksoup(self):
         try:
             resp = requests.get(self.url)
             source = resp.text
@@ -43,10 +43,48 @@ class Watcher():
         except requests.exceptions.ConnectionError:
             self.log.info(f"[{self.url}] Disconnecting!")
 
+    def checkpostman(self):
+        try:
+            parsed_content = self.parse()
+            if self.last_content is None:
+                self.last_content = parsed_content
+                self.log.info(f"[{self.url}] Start Monitoring!")
+            elif self.last_content != parsed_content:
+                self.slack_msg.send(self.template)
+                self.last_content = parsed_content
+                self.log.info(f"[{self.url}] something changed!")
+            else:
+                self.log.info(f"[{self.url}] Nothing changed!")
+        except requests.exceptions.ConnectionError:
+            self.log.info(f"[{self.url}] Disconnecting!")
+
+
+class SBCWatcher(Watcher):
+    def __init__(self, url, template):
+        super(SBCWatcher, self).__init__(url, template)
+
+    def parse(self):
+        payload = "{\"pageInfo\":{\"nowPage\":\"1\",\"pageCount\":10,\"rowCount\":10,\"maxPage\":\"\",\"searchC\":\"\",\"searchG\":\"\",\"searchT\":\"\",\"param\":\"proc=List\",\"resultCd\":\"\",\"resultMsg\>}"  # noqa
+        headers = {
+            'accept': "application/json",
+            'submissionid': "getInfoList",
+            'origin': "http://hp.sbc.or.kr",
+            'user-agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",  # noqa
+            'content-type': "application/json; charset=\"UTF-8\"",
+            'referer': "http://hp.sbc.or.kr/websquare/websquare.jsp?w2xPath=/SBC/n_news/notice/notice_list.xml",  # noqa
+            'accept-encoding': "gzip, deflate",
+            'accept-language': "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            'cookie': "WMONID=GtJw3KRl_Jb; JSESSIONID_SBC=c46sniugt7KHD4fVmzwBJiU91SiB-OyXyeHuqRaFM8i-6EWpNvgw!-900504505; wcs_bt=1076b58a5102e64:1531904537; lastAccess=1531904538020",  # noqa
+            'cache-control': "no-cache",
+            'postman-token': "883631c4-2fd3-d638-356e-a21e58f04365",
+            }
+        parsed = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
+        return parsed.text
+
 
 class SnuWatcher(Watcher):
     def __init__(self, url, template):
-        super(SnuWatcher, self).__init__(url, template)  # noqa
+        super(SnuWatcher, self).__init__(url, template)
 
     def parse(self, soup):
         content = soup.find('section')
@@ -57,7 +95,7 @@ class SnuWatcher(Watcher):
 
 class LocalWatcher(Watcher):
     def __init__(self, url, template):
-        super(LocalWatcher, self).__init__(url, template)  # noqa
+        super(LocalWatcher, self).__init__(url, template)
 
     def parse(self, soup):
         content = soup.find('ul')
@@ -67,7 +105,7 @@ class LocalWatcher(Watcher):
 
 class OnePieceWatcher(Watcher):
     def __init__(self, url, template):
-        super(OnePieceWatcher, self).__init__(url, template)  # noqa
+        super(OnePieceWatcher, self).__init__(url, template)
 
     def parse(self, soup):
         content = soup.findAll('a')
@@ -77,7 +115,7 @@ class OnePieceWatcher(Watcher):
 
 class KongjuWatcher(Watcher):
     def __init__(self, url, template):
-        super(KongjuWatcher, self).__init__(url, template)  # noqa
+        super(KongjuWatcher, self).__init__(url, template)
 
     def parse(self, soup):
         content = soup.findAll('td', class_='lmcNotice')
@@ -86,7 +124,7 @@ class KongjuWatcher(Watcher):
 
 
 def main():
-    watch_list = [
+    watch_soup_list = [
         LocalWatcher(
             url="http://localhost:8000",
             template=NotiTemplate(
@@ -95,7 +133,7 @@ def main():
                 title="local watch!",
                 title_link="http://localhost:8000",
                 color=colormap["sky"],
-            )
+            ),
         ),
          KongjuWatcher(
              url="http://cse.kongju.ac.kr/community/notice.asp",
@@ -103,7 +141,7 @@ def main():
                  pretext=f"@sdalbsoo님! 확인바랍니다.",
                  text="공지가 업데이트됐습니다.",
                  title="공주대 공지!",
-                 title_link="http://cse.kongju.ac.kr/community/notice.asp",  # noqa
+                 title_link="http://cse.kongju.ac.kr/community/notice.asp",
                  color=colormap["sky"],
              ),
          ),
@@ -115,23 +153,38 @@ def main():
                 title="서울대 공지!",
                 title_link="http://ie.snu.ac.kr/ko/board/7",
                 color=colormap["sky"],
-            )
+            ),
         ),
-        # OnePieceWatcher(
-            # url="http://onenable.tumblr.com/OnePiece",
-            # template=NotiTemplate(
-                # pretext=f"확인 바랍니다.",
-                # text="원피스 최신화가 업데이트됐습니다.",
-                # title="원피스 최신화!",
-                # title_link="http://onenable.tumblr.com/OnePiece",
-                # color=colormap["yellow"],
-            # ),
-        # )
+        OnePieceWatcher(
+            url="http://onenable.tumblr.com/OnePiece",
+            template=NotiTemplate(
+                pretext=f"확인 바랍니다.",
+                text="원피스 최신화가 업데이트됐습니다.",
+                title="원피스 최신화!",
+                title_link="http://onenable.tumblr.com/OnePiece",
+                color=colormap["yellow"],
+            ),
+        ),
+    ]
+
+    watch_postman_list = [
+        SBCWatcher(
+            url="http://hp.sbc.or.kr/news/notice.do",
+            template=NotiTemplate(
+                pretext=f"@sdalbsoo님! 확인 바랍니다.",
+                text="공지가 업데이트됐습니다.",
+                title="중소기업 공지!",
+                title_link="http://hp.sbc.or.kr/websquare/websquare.jsp?w2xPath=/SBC/n_news/notice/notice_list.xml",  # noqa
+                color=colormap["sky"],
+            ),
+        ),
     ]
     while 1:
-        for watch in watch_list:
-            watch.check()
-        time.sleep(5)
+        for watch_soup in watch_soup_list:
+            watch_soup.checksoup()
+        for watch_postman in watch_postman_list:
+            watch_postman.checkpostman()
+        time.sleep(2)
 
 
 if __name__ == "__main__":
