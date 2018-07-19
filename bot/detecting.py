@@ -25,27 +25,12 @@ class Watcher():
 
         self.last_content = None
 
-    def checksoup(self):
+    def check(self):
         try:
             resp = requests.get(self.url)
             source = resp.text
             soup = BeautifulSoup(source, 'lxml')
             parsed_content = self.parse(soup)
-            if self.last_content is None:
-                self.last_content = parsed_content
-                self.log.info(f"[{self.url}] Start Monitoring!")
-            elif self.last_content != parsed_content:
-                self.slack_msg.send(self.template)
-                self.last_content = parsed_content
-                self.log.info(f"[{self.url}] something changed!")
-            else:
-                self.log.info(f"[{self.url}] Nothing changed!")
-        except requests.exceptions.ConnectionError:
-            self.log.info(f"[{self.url}] Disconnecting!")
-
-    def checkpostman(self):
-        try:
-            parsed_content = self.parse()
             if self.last_content is None:
                 self.last_content = parsed_content
                 self.log.info(f"[{self.url}] Start Monitoring!")
@@ -80,6 +65,21 @@ class SBCWatcher(Watcher):
             }
         parsed = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
         return parsed.text
+
+    def check(self):
+        try:
+            parsed_content = self.parse()
+            if self.last_content is None:
+                self.last_content = parsed_content
+                self.log.info(f"[{self.url}] Start Monitoring!")
+            elif self.last_content != parsed_content:
+                self.slack_msg.send(self.template)
+                self.last_content = parsed_content
+                self.log.info(f"[{self.url}] something changed!")
+            else:
+                self.log.info(f"[{self.url}] Nothing changed!")
+        except requests.exceptions.ConnectionError:
+            self.log.info(f"[{self.url}] Disconnecting!")
 
 
 class SnuWatcher(Watcher):
@@ -124,7 +124,7 @@ class KongjuWatcher(Watcher):
 
 
 def main():
-    watch_soup_list = [
+    watch_list = [
         LocalWatcher(
             url="http://localhost:8000",
             template=NotiTemplate(
@@ -135,7 +135,7 @@ def main():
                 color=colormap["sky"],
             ),
         ),
-         KongjuWatcher(
+        KongjuWatcher(
              url="http://cse.kongju.ac.kr/community/notice.asp",
              template=NotiTemplate(
                  pretext=f"@sdalbsoo님! 확인바랍니다.",
@@ -165,9 +165,6 @@ def main():
                 color=colormap["yellow"],
             ),
         ),
-    ]
-
-    watch_postman_list = [
         SBCWatcher(
             url="http://hp.sbc.or.kr/news/notice.do",
             template=NotiTemplate(
@@ -180,11 +177,9 @@ def main():
         ),
     ]
     while 1:
-        for watch_soup in watch_soup_list:
-            watch_soup.checksoup()
-        for watch_postman in watch_postman_list:
-            watch_postman.checkpostman()
-        time.sleep(2)
+        for watch in watch_list:
+            watch.check()
+        time.sleep(10)
 
 
 if __name__ == "__main__":
