@@ -44,6 +44,16 @@ class Watcher():
             self.log.info(f"[{self.url}] Disconnecting!")
 
 
+class Kongju_StudentWatcher(Watcher):
+    def __init__(self, url, template):
+        super(Kongju_StudentWatcher, self).__init__(url, template)
+
+    def parse(self, soup):
+        content = soup.findAll('td', class_='table_td2')
+        parsed = content
+        return parsed
+
+
 class SBCWatcher(Watcher):
     def __init__(self, url, template):
         super(SBCWatcher, self).__init__(url, template)
@@ -63,12 +73,13 @@ class SBCWatcher(Watcher):
             'cache-control': "no-cache",
             'postman-token': "883631c4-2fd3-d638-356e-a21e58f04365",
             }
-        parsed = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
-        return parsed.text
+        return payload, headers
 
     def check(self):
         try:
-            parsed_content = self.parse()
+            payload, headers = self.parse()
+            parsed = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
+            parsed_content = parsed.text
             if self.last_content is None:
                 self.last_content = parsed_content
                 self.log.info(f"[{self.url}] Start Monitoring!")
@@ -172,6 +183,16 @@ def main():
                 text="공지가 업데이트됐습니다.",
                 title="중소기업 공지!",
                 title_link="http://hp.sbc.or.kr/websquare/websquare.jsp?w2xPath=/SBC/n_news/notice/notice_list.xml",  # noqa
+                color=colormap["sky"],
+            ),
+        ),
+        Kongju_StudentWatcher(
+            url="http://www.kongju.ac.kr/lounge/board.jsp?page=0&board=student_news",  # noqa
+            template=NotiTemplate(
+                pretext=f"@sdalbsoo님! 확인 바랍니다.",
+                text="공지가 업데이트됐습니다.",
+                title="공주대학교 학생공지!",
+                title_link="http://www.kongju.ac.kr/lounge/board.jsp?page=0&board=student_news",  # noqa
                 color=colormap["sky"],
             ),
         ),
