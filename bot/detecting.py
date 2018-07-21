@@ -44,9 +44,9 @@ class Watcher():
             self.log.info(f"[{self.url}] Disconnecting!")
 
 
-class Kongju_StudentWatcher(Watcher):
+class KongjuStudentWatcher(Watcher):
     def __init__(self, url, template):
-        super(Kongju_StudentWatcher, self).__init__(url, template)
+        super(KongjuStudentWatcher, self).__init__(url, template)
 
     def parse(self, soup):
         content = soup.findAll('td', class_='table_td2')
@@ -73,13 +73,13 @@ class SBCWatcher(Watcher):
             'cache-control': "no-cache",
             'postman-token': "883631c4-2fd3-d638-356e-a21e58f04365",
             }
-        return payload, headers
+        content = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
+        parsed = content.text
+        return parsed
 
     def check(self):
         try:
-            payload, headers = self.parse()
-            parsed = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
-            parsed_content = parsed.text
+            parsed_content = self.parse()
             if self.last_content is None:
                 self.last_content = parsed_content
                 self.log.info(f"[{self.url}] Start Monitoring!")
@@ -186,7 +186,7 @@ def main():
                 color=colormap["sky"],
             ),
         ),
-        Kongju_StudentWatcher(
+        KongjuStudentWatcher(
             url="http://www.kongju.ac.kr/lounge/board.jsp?page=0&board=student_news",  # noqa
             template=NotiTemplate(
                 pretext=f"@sdalbsoo님! 확인 바랍니다.",
