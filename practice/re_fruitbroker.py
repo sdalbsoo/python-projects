@@ -2,21 +2,21 @@ class FruitBuyer():
     def __init__(self, money):
         self.money = money
         self.num_apples = 0
+        self.change = 0
 
     def buy_apples(self, broker, money):
-        cheap_seller = broker.select_cheapest_seller()
-        change = cheap_seller.sell_apples(money, broker)
-        apples_num = broker.sell_apple()
+        apples_num, self.change = broker.sell_apples(money)
         if self.money < (broker.cheap_seller.price_apple * apples_num):
             raise ValueError("입력을 잘못하셨습니다.")
         elif self.money >= (broker.cheap_seller.price_apple * apples_num):
             self.num_apples += apples_num
-            self.money = self.money - broker.cheap_seller.price_apple * apples_num  # noqa
+            self.money = self.money - broker.cheap_seller.price_apple * apples_num # noqa
 
     def __str__(self):
         return(
             f"FruitBuyer: <받은 사과:{self.num_apples}, "
-            f"남은 돈: {self.money}>"
+            f"남은 돈: {self.money}, "
+            f"거스름돈: {self.change}>"
         )
 
     def __repr__(self):
@@ -24,25 +24,24 @@ class FruitBuyer():
 
 
 class FruitSeller():
+    commission = 0.1
+
     def __init__(self, num_apples, price_apple):
         self.num_apples = num_apples
         self.price_apple = price_apple
         self.money = 0
-        self.apples_num = 0
 
-    def sell_apples(self, money, broker):
+    def sell_apples(self, money):
         if (money // self.price_apple) >= self.num_apples:
-            self.apples_num = self.num_apples
+            apples_num = self.num_apples
             self.num_apples = 0
-            self.money += (self.apples_num * self.price_apple) - broker.money()  # noqa
-            change = money - self.apples_num * self.price_apple
-            return change
+            self.money += (apples_num * self.price_apple) - (self.commission * apples_num * self.price_apple)  # noqa
+            return apples_num
         elif 0 <= (money // self.price_apple) < self.num_apples:
-            self.apples_num = money // self.price_apple
-            self.num_apples -= self.apples_num
-            self.money += self.apples_num * self.price_apple - broker.money()
-            change = money - (self.apples_num * self.price_apple)
-            return  change
+            apples_num = money // self.price_apple
+            self.num_apples -= apples_num
+            self.money += apples_num * self.price_apple - (self.commission * apples_num * self.price_apple)  # noqa
+            return apples_num
         else:
             raise ValueError("입력을 잘못하셨습니다.")
 
@@ -54,12 +53,10 @@ class FruitSeller():
 
 
 class FruitBroker():
-    commission = 0.10
-
     def __init__(self, sellers):
         self.cheap_seller = sellers[0]
-        self.sum_money = 0
         self.sellers = sellers
+        self.sum_money = 0
 
     def select_cheapest_seller(self):
         for seller in self.sellers:
@@ -67,16 +64,12 @@ class FruitBroker():
                 self.cheap_seller = seller
         return self.cheap_seller
 
-    def money(self):
+    def sell_apples(self, money):
         cheap_seller = self.select_cheapest_seller()
-        money = (cheap_seller.price_apple * cheap_seller.apples_num * self.commission)  # noqa
-        self.sum_money += money
-        return money
-
-    def sell_apple(self):
-        cheap_seller = self.select_cheapest_seller()
-        apples_num = cheap_seller.apples_num
-        return apples_num
+        apples_num = cheap_seller.sell_apples(money)
+        self.sum_money += (apples_num * cheap_seller.price_apple * cheap_seller.commission)  # noqa
+        change = money - (apples_num * cheap_seller.price_apple)
+        return apples_num, change
 
     def __str__(self):
         return(f"Broker: <수수료 합계: {self.sum_money}>")
@@ -88,17 +81,17 @@ class FruitBroker():
 def main():
     sellers = [
         FruitSeller(30, 3000), FruitSeller(50, 2500),
-        FruitSeller(20, 7000), FruitSeller(90, 500),
+        FruitSeller(20, 7000), FruitSeller(90, 1500),
     ]
     broker = FruitBroker(sellers)
-    buyer = FruitBuyer(70000)
-    buyer.buy_apples(broker, 1000)
+    buyer = FruitBuyer(50000)
+    buyer.buy_apples(broker, 11200)
     print("=" * 40)
     print(buyer)
     print(broker.cheap_seller)
     print(broker)
     print("=" * 40)
-    buyer.buy_apples(broker, 30000)
+    buyer.buy_apples(broker, 10000)
     print("=" * 40)
     print(buyer)
     print(broker.cheap_seller)

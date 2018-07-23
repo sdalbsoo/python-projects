@@ -14,18 +14,17 @@ def test_FruitBroker():
     buyer.buy_apples(broker, 30000)
     assert buyer.num_apples == 20
     assert buyer.money == 40000
+    assert buyer.change == 0
     assert broker.sum_money == 3000
     assert sellers[3].money == 27000
-    assert sellers[3].apples_num == 20
     assert sellers[3].num_apples == 20
     buyer.buy_apples(broker, 35000)
     assert buyer.num_apples == 40
     assert buyer.money == 10000
+    assert buyer.change == 5000
     assert broker.sum_money == 6000
     assert sellers[3].money == 54000
-    assert sellers[3].apples_num == 20
     assert sellers[3].num_apples == 0
-
 
     buyer = FruitBuyer(70000)
     sellers = [
@@ -36,16 +35,16 @@ def test_FruitBroker():
     buyer.buy_apples(broker, 40000)
     assert buyer.num_apples == 40
     assert buyer.money == 30000
+    assert buyer.change == 0
     assert broker.sum_money == 4000
     assert sellers[1].money == 36000
-    assert sellers[1].apples_num == 40
     assert sellers[1].num_apples == 10
     buyer.buy_apples(broker, 40000)
     assert buyer.num_apples == 50
     assert buyer.money == 20000
+    assert buyer.change == 30000
     assert broker.sum_money == 5000
     assert sellers[1].money == 45000
-    assert sellers[1].apples_num == 10
     assert sellers[1].num_apples == 0
 
     sellers = [
