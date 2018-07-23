@@ -1,4 +1,6 @@
 import time
+from abc import abstractmethod
+from abc import ABC
 
 from bs4 import BeautifulSoup
 import requests
@@ -16,7 +18,7 @@ colormap = {
 }
 
 
-class Watcher():
+class Watcher(ABC):
     def __init__(self, url, template):
         self.url = url
         self.slack_msg = SlackMessage()
@@ -27,10 +29,7 @@ class Watcher():
 
     def check(self):
         try:
-            resp = requests.get(self.url)
-            source = resp.text
-            soup = BeautifulSoup(source, 'lxml')
-            parsed_content = self.parse(soup)
+            parsed_content = self.parse(self.crawl())
             if self.last_content is None:
                 self.last_content = parsed_content
                 self.log.info(f"[{self.url}] Start Monitoring!")
@@ -42,6 +41,16 @@ class Watcher():
                 self.log.info(f"[{self.url}] Nothing changed!")
         except requests.exceptions.ConnectionError:
             self.log.info(f"[{self.url}] Disconnecting!")
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        source = resp.text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    @abstractmethod
+    def parse(self):
+        pass
 
 
 class KongjuStudentWatcher(Watcher):
@@ -58,7 +67,7 @@ class SBCWatcher(Watcher):
     def __init__(self, url, template):
         super(SBCWatcher, self).__init__(url, template)
 
-    def parse(self):
+    def crawl(self):
         payload = "{\"pageInfo\":{\"nowPage\":\"1\",\"pageCount\":10,\"rowCount\":10,\"maxPage\":\"\",\"searchC\":\"\",\"searchG\":\"\",\"searchT\":\"\",\"param\":\"proc=List\",\"resultCd\":\"\",\"resultMsg\>}"  # noqa
         headers = {
             'accept': "application/json",
@@ -73,13 +82,16 @@ class SBCWatcher(Watcher):
             'cache-control': "no-cache",
             'postman-token': "883631c4-2fd3-d638-356e-a21e58f04365",
             }
-        content = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
-        parsed = content.text
-        return parsed
+        resp = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
+        return resp
+
+    def parse(self, input):
+        return input
 
     def check(self):
         try:
-            parsed_content = self.parse()
+            resp = self.crawl()
+            parsed_content = self.parse(resp.text)
             if self.last_content is None:
                 self.last_content = parsed_content
                 self.log.info(f"[{self.url}] Start Monitoring!")
