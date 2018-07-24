@@ -56,7 +56,7 @@ class FruitBroker():
     def __init__(self, sellers):
         self.cheap_seller = sellers[0]
         self.sellers = sellers
-        self.sum_money = 0
+        self.money = 0
 
     def select_cheapest_seller(self):
         for seller in self.sellers:
@@ -67,12 +67,12 @@ class FruitBroker():
     def sell_apples(self, money):
         cheap_seller = self.select_cheapest_seller()
         apples_num = cheap_seller.sell_apples(money)
-        self.sum_money += (apples_num * cheap_seller.price_apple * cheap_seller.commission)  # noqa
+        self.money += (apples_num * cheap_seller.price_apple * cheap_seller.commission)  # noqa
         change = money - (apples_num * cheap_seller.price_apple)
         return apples_num, change
 
     def __str__(self):
-        return(f"Broker: <수수료 합계: {self.sum_money}>")
+        return(f"Broker: <수수료 합계: {self.money}>")
 
     def __repr__(self):
         return str(self)
