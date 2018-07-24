@@ -29,7 +29,7 @@ class Watcher(ABC):
 
     def check(self):
         try:
-            parsed_content = self.parse(self.crawl())
+            parsed_content = self.parse()
             if self.last_content is None:
                 self.last_content = parsed_content
                 self.log.info(f"[{self.url}] Start Monitoring!")
@@ -42,30 +42,22 @@ class Watcher(ABC):
         except requests.exceptions.ConnectionError:
             self.log.info(f"[{self.url}] Disconnecting!")
 
-    def crawl(self):
-        resp = requests.get(self.url)
-        source = resp.text
-        soup = BeautifulSoup(source, 'lxml')
-        return soup
-
     @abstractmethod
     def parse(self):
         pass
 
-
-class KongjuStudentWatcher(Watcher):
-    def __init__(self, url, template):
-        super(KongjuStudentWatcher, self).__init__(url, template)
-
-    def parse(self, soup):
-        content = soup.findAll('td', class_='table_td2')
-        parsed = content
-        return parsed
+    @abstractmethod
+    def crawl(self):
+        pass
 
 
 class SBCWatcher(Watcher):
     def __init__(self, url, template):
         super(SBCWatcher, self).__init__(url, template)
+
+    def parse(self):
+        parsed = self.crawl().text
+        return parsed
 
     def crawl(self):
         payload = "{\"pageInfo\":{\"nowPage\":\"1\",\"pageCount\":10,\"rowCount\":10,\"maxPage\":\"\",\"searchC\":\"\",\"searchG\":\"\",\"searchT\":\"\",\"param\":\"proc=List\",\"resultCd\":\"\",\"resultMsg\>}"  # noqa
@@ -85,65 +77,97 @@ class SBCWatcher(Watcher):
         resp = requests.request("POST", self.url, data=payload, headers=headers)  # noqa
         return resp
 
-    def parse(self, input):
-        return input
 
-    def check(self):
-        try:
-            resp = self.crawl()
-            parsed_content = self.parse(resp.text)
-            if self.last_content is None:
-                self.last_content = parsed_content
-                self.log.info(f"[{self.url}] Start Monitoring!")
-            elif self.last_content != parsed_content:
-                self.slack_msg.send(self.template)
-                self.last_content = parsed_content
-                self.log.info(f"[{self.url}] something changed!")
-            else:
-                self.log.info(f"[{self.url}] Nothing changed!")
-        except requests.exceptions.ConnectionError:
-            self.log.info(f"[{self.url}] Disconnecting!")
+class KongjuStudentWatcher(Watcher):
+    def __init__(self, url, template):
+        super(KongjuStudentWatcher, self).__init__(url, template)
+
+    def parse(self):
+        parsed = self.setup_parser().findAll('td', class_='table_td2')
+        return parsed
+
+    def setup_parser(self):
+        source = self.crawl().text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        return resp
 
 
 class SnuWatcher(Watcher):
     def __init__(self, url, template):
         super(SnuWatcher, self).__init__(url, template)
 
-    def parse(self, soup):
-        content = soup.find('section')
+    def parse(self):
+        content = self.setup_parser().find('section')
         temp = content.findAll('td', class_='views-field views-field-title-field')  # noqa
         parsed = [v.find('a').text for v in temp]
         return parsed
+
+    def setup_parser(self):
+        source = self.crawl().text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        return resp
 
 
 class LocalWatcher(Watcher):
     def __init__(self, url, template):
         super(LocalWatcher, self).__init__(url, template)
 
-    def parse(self, soup):
-        content = soup.find('ul')
-        parsed = content
+    def parse(self):
+        parsed = self.setup_parser().find('ul')
         return parsed
+
+    def setup_parser(self):
+        source = self.crawl().text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        return resp
 
 
 class OnePieceWatcher(Watcher):
     def __init__(self, url, template):
         super(OnePieceWatcher, self).__init__(url, template)
 
-    def parse(self, soup):
-        content = soup.findAll('a')
-        parsed = content
+    def parse(self):
+        parsed = self.setup_parser().findAll('a')
         return parsed
+
+    def setup_parser(self):
+        source = self.crawl().text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        return resp
 
 
 class KongjuWatcher(Watcher):
     def __init__(self, url, template):
         super(KongjuWatcher, self).__init__(url, template)
 
-    def parse(self, soup):
-        content = soup.findAll('td', class_='lmcNotice')
-        parsed = content
+    def parse(self):
+        parsed = self.setup_parser().findAll('td', class_='lmcNotice')
         return parsed
+
+    def setup_parser(self):
+        source = self.crawl().text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        return resp
 
 
 def main():
@@ -212,7 +236,7 @@ def main():
     while 1:
         for watch in watch_list:
             watch.check()
-        time.sleep(10)
+        time.sleep(5)
 
 
 if __name__ == "__main__":
