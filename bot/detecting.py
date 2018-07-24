@@ -1,4 +1,5 @@
 import time
+import sys
 from abc import abstractmethod
 from abc import ABC
 
@@ -42,12 +43,17 @@ class Watcher(ABC):
         except requests.exceptions.ConnectionError:
             self.log.info(f"[{self.url}] Disconnecting!")
 
-    @abstractmethod
-    def parse(self):
-        pass
+    def setup_parser(self):
+        source = self.crawl().text
+        soup = BeautifulSoup(source, 'lxml')
+        return soup
+
+    def crawl(self):
+        resp = requests.get(self.url)
+        return resp
 
     @abstractmethod
-    def crawl(self):
+    def parse(self):
         pass
 
 
@@ -86,15 +92,6 @@ class KongjuStudentWatcher(Watcher):
         parsed = self.setup_parser().findAll('td', class_='table_td2')
         return parsed
 
-    def setup_parser(self):
-        source = self.crawl().text
-        soup = BeautifulSoup(source, 'lxml')
-        return soup
-
-    def crawl(self):
-        resp = requests.get(self.url)
-        return resp
-
 
 class SnuWatcher(Watcher):
     def __init__(self, url, template):
@@ -106,15 +103,6 @@ class SnuWatcher(Watcher):
         parsed = [v.find('a').text for v in temp]
         return parsed
 
-    def setup_parser(self):
-        source = self.crawl().text
-        soup = BeautifulSoup(source, 'lxml')
-        return soup
-
-    def crawl(self):
-        resp = requests.get(self.url)
-        return resp
-
 
 class LocalWatcher(Watcher):
     def __init__(self, url, template):
@@ -123,15 +111,6 @@ class LocalWatcher(Watcher):
     def parse(self):
         parsed = self.setup_parser().find('ul')
         return parsed
-
-    def setup_parser(self):
-        source = self.crawl().text
-        soup = BeautifulSoup(source, 'lxml')
-        return soup
-
-    def crawl(self):
-        resp = requests.get(self.url)
-        return resp
 
 
 class OnePieceWatcher(Watcher):
@@ -142,15 +121,6 @@ class OnePieceWatcher(Watcher):
         parsed = self.setup_parser().findAll('a')
         return parsed
 
-    def setup_parser(self):
-        source = self.crawl().text
-        soup = BeautifulSoup(source, 'lxml')
-        return soup
-
-    def crawl(self):
-        resp = requests.get(self.url)
-        return resp
-
 
 class KongjuWatcher(Watcher):
     def __init__(self, url, template):
@@ -160,17 +130,9 @@ class KongjuWatcher(Watcher):
         parsed = self.setup_parser().findAll('td', class_='lmcNotice')
         return parsed
 
-    def setup_parser(self):
-        source = self.crawl().text
-        soup = BeautifulSoup(source, 'lxml')
-        return soup
-
-    def crawl(self):
-        resp = requests.get(self.url)
-        return resp
-
 
 def main():
+    loop_time = sys.argv[1]
     watch_list = [
         LocalWatcher(
             url="http://localhost:8000",
@@ -236,7 +198,7 @@ def main():
     while 1:
         for watch in watch_list:
             watch.check()
-        time.sleep(5)
+        time.sleep(int(loop_time))
 
 
 if __name__ == "__main__":
