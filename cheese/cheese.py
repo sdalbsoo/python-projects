@@ -1,4 +1,6 @@
 import re
+from abc import abstractmethod
+from bs4 import BeautifulSoup
 
 import requests
 
@@ -18,12 +20,20 @@ class SubtitleParser():
         assert len(match.groups()) == 1
         return match.groups()[0]
 
+    @abstractmethod
+    def extract_sentences(self):
+        pass
+
+    @abstractmethod
+    def extract_word(self):
+        pass
+
 
 class SrtParser(SubtitleParser):
     def __init__(self, srt_path):
         super(SrtParser, self).__init__()
         with open(srt_path, 'r') as f:
-            self.lines = f.read().lower().splitlines()
+            self.lines = f.read().replace(',', '').lower().splitlines()
 
     def extract_sentences(self):
         sentences = []
@@ -47,17 +57,26 @@ class SrtParser(SubtitleParser):
         return words
 
 
-class SmiParser():
+class SmiParser(SubtitleParser):
     def __init__(self):
         pass
 
+    def extract_sentences(self):
+        pass
+
+    def extract_words(self):
+        pass
 
 class DictParser():
     def searchdict(extractwords):
-        words = []
-        meaing_words = []
+        meaning_words = []
         for key, value in extractwords.items():
-            words.append(key)
+            url = 'http://alldic.daum.net/search.do?q={}'.format(key)
+            response = requests.get(url)
+            source = response.text
+            soup = BeautifulSoup(source, 'lxml')
+            parsed = soup.find('span', class_='txt_search')
+            meaning_words.append(parsed.string)
         # requests모듈 이용해서 단어 검색하는 코드 추가한 뒤 뜻들을 meaning_words에 append
         return meaning_words  # 영단어 뜻이 있는 리스트를 return
 
