@@ -67,6 +67,7 @@ class SmiParser(SubtitleParser):
     def extract_words(self):
         pass
 
+
 class DictParser():
     def searchdict(extractwords):
         meaning_words = []
@@ -77,8 +78,7 @@ class DictParser():
             soup = BeautifulSoup(source, 'lxml')
             parsed = soup.find('span', class_='txt_search')
             meaning_words.append(parsed.string)
-        # requests모듈 이용해서 단어 검색하는 코드 추가한 뒤 뜻들을 meaning_words에 append
-        return meaning_words  # 영단어 뜻이 있는 리스트를 return
+        return meaning_words
 
 
 def main():
@@ -87,6 +87,7 @@ def main():
     sentences = srt.extract_sentences()
     extractwords = srt.extract_words(sentences)
     meaning_words = DictParser.searchdict(extractwords)
+    print(meaning_words)
 
 
 if __name__ == '__main__':
