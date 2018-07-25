@@ -10,7 +10,7 @@ def test_ascending():
     assert nums == ans
 
 
-def test_ascending_order():
+def test_ascending_sort():
     nums = random.sample(range(10), 5)
     sorted_ans = sorted(nums)
     sort.bubble_sort(nums)
