@@ -1,12 +1,22 @@
+import copy
+
+
 def bubble_sort(nums):
-    for i in range(len(nums)-1):
-        for j in range(1, len(nums)-i):
-            if nums[j-1] > nums[j]:
-                temp = nums[j-1]
-                nums[j-1] = nums[j]
-                nums[j] = temp
-    return nums
+    nums_copy = copy.deepcopy(nums)
+    for i in range(len(nums_copy)-1):
+        for j in range(1, len(nums_copy)-i):
+            if nums_copy[j-1] > nums_copy[j]:
+                temp = nums_copy[j-1]
+                nums_copy[j-1] = nums_copy[j]
+                nums_copy[j] = temp
+    return nums_copy
 
 
-nums = [9, 7, 1, 3, 6, 10, 1, 4]
-print(bubble_sort(nums))
+def main():
+    nums = [9, 7, 1, 3, 6, 10, 1, 4]
+    print(nums)
+    print(bubble_sort(nums))
+
+
+if __name__ == "__main__":
+    main()
