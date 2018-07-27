@@ -1,0 +1,17 @@
+1
+00:00:42,802 --> 00:00:44,842
+<i>Report
+to your stations immediately.</i>
+
+2
+00:00:44,962 --> 00:00:46,566
+<i>This is not a drill.</i>
+
+3
+00:00:46,642 --> 00:00:47,723
+<i>We are under attack!</i>
+
+4
+00:00:49,122 --> 00:00:51,090
+<i>We are under attack!</i>
+
