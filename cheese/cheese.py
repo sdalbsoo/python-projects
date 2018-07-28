@@ -13,10 +13,10 @@ class SubtitleParser():
         with open(constants.PATH_STOPWORDS, "r") as f:
             self.stopwords = set(f.read().splitlines())
 
-    def remove_tag(self, text,):
-        cleanr = re.compile('<.*?>')
-        cleantext = re.sub(cleanr, '', text)
-        return cleantext
+    def remove_tag(self, text):
+        cleaner = re.compile('<.*?>')
+        clean_text = re.sub(cleaner, '', text)
+        return clean_text
         # regex = f"<{tag}>(.*?)</{tag}>"
         # matches = re.finditer(regex, text, re.MULTILINE)
         # match = list(matches)[0]
@@ -36,7 +36,13 @@ class SrtParser(SubtitleParser):
     def __init__(self, srt_path):
         super(SrtParser, self).__init__()
         with open(srt_path, 'r') as f:
-            self.lines = f.read().replace(',', '').replace('.', '').lower().splitlines()  # noqa
+            replace_words = [
+                ',', '.', '!', '?'
+            ]
+            content = f.read()
+            for replace_word in replace_words:
+                content.replace(replace_word, '')
+            self.lines = content.lower().splitlines()
 
     def extract_sentences(self):
         sentences = []
@@ -47,7 +53,7 @@ class SrtParser(SubtitleParser):
                 continue
             if len(line) == 0:
                 continue
-            line = self.remove_tag(line,)
+            line = self.remove_tag(line)
             sentences.append(line)
         return sentences
 
@@ -72,12 +78,13 @@ class SmiParser(SubtitleParser):
 
 
 class DictParser():
-    def searchdict(extractwords):
+    def searchdict(extracted_words):
         meaning_words = {}
-        for i, word in enumerate(extractwords):
-            url = 'http://alldic.daum.net/search.do?q={}'.format(word)
+        for i, word in enumerate(extracted_words):
+            daum_url = 'http://alldic.daum.net/search.do?q={}'
+            search_url = daum_url.format(word)
             temp = []
-            response = requests.get(url)
+            response = requests.get(search_url)
             source = response.text
             soup = BeautifulSoup(source, 'lxml')
             parsed = soup.find_all('span', class_='txt_search', limit=3)
@@ -92,19 +99,19 @@ class DictParser():
         return meaning_words
 
     def remove_tag(text):
-        cleanr = re.compile('<.*?>')
-        cleantext = re.sub(cleanr, '', text)
-        return cleantext
+        cleaner = re.compile('<.*?>')
+        clean_text = re.sub(cleaner, '', text)
+        return clean_text
 
 
 def main():
     srt_path = "../data/srt/lionking.srt"
     srt = SrtParser(srt_path)
     sentences = srt.extract_sentences()
-    extractwords = srt.extract_words(sentences)
-    print(extractwords)
-    meaning_words = DictParser.searchdict(extractwords)
-    print(meaning_words)
+    extracted_words = srt.extract_words(sentences)
+    print(extracted_words)
+    meanings = DictParser.searchdict(extracted_words)
+    print(meanings)
 
 
 if __name__ == '__main__':
