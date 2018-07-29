@@ -1,9 +1,12 @@
+from pathlib import Path
+
 from cheese import SubtitleParser
 from cheese import SrtParser
+import constants
 
 
 def test_srt_extract_meaning():
-    srt_parser = SrtParser("../data/srt/lionking.srt")
+    srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"))
     sentences = srt_parser.extract_sentences()
     words = srt_parser.extract_words(sentences)
     meanings = srt_parser.extract_meanings(words)
@@ -20,7 +23,7 @@ def test_srt_extract_meaning():
 
 
 def test_srt_extract_words():
-    srt_parser = SrtParser("../data/srt/lionking.srt")
+    srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"))
     sentences = srt_parser.extract_sentences()
     words = srt_parser.extract_words(sentences)
     assert words == {"day": 1, "arrive": 1,
@@ -29,7 +32,7 @@ def test_srt_extract_words():
 
 
 def test_srt_extract_sentence():
-    srt_parser = SrtParser("../data/srt/lionking.srt")
+    srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"))
     sentences = srt_parser.extract_sentences()
     assert sentences == ["from the day we arrive",
                          "on the planet",
