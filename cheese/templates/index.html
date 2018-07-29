@@ -1,0 +1,13 @@
+{% if path == None %}
+  <h1>Please upload your subtitle</h1>
+  <form action="/upload_file" method=post enctype=multipart/form-data>
+    <input type=file name=file>
+    <input type=submit value="Subtitle Upload">
+  </form>
+{% else %}
+  <h1> Dictionary for you! </h1>
+  {% for word, meaning in word_meanings.items() %}
+    <h3> {{ word }} </h3>
+    <p> {{ meaning }} </p>
+  {% endfor %}
+{% endif %}

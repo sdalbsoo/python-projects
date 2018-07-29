@@ -4,3 +4,4 @@ requests
 ipython
 lxml
 beautifulsoup4
+flask
