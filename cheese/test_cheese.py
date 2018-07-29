@@ -1,6 +1,5 @@
 from cheese import SubtitleParser
 from cheese import SrtParser
-from cheese import DictParser
 
 
 def test_srt_extract_meaning():

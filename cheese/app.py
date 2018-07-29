@@ -1,11 +1,14 @@
+import os
+
+from werkzeug import secure_filename
 from flask import Flask
 from flask import render_template
 from flask import request
-import os
-from flask import Flask, request, redirect, url_for
-from werkzeug import secure_filename
+from flask import redirect
+from flask import url_for
 
 from cheese import SrtParser
+
 
 UPLOAD_FOLDER = '/Users/Sdalbsoo/workspace/python-projects/cheese/files'
 ALLOWED_EXTENSIONS = set(['srt'])
@@ -23,13 +26,17 @@ def allowed_file(filename):
 @app.route("/")
 def index():
     subtitle_path = request.args.get("path", None)
-    meanings = None
+    word_meanings = None
     if subtitle_path is not None:
         srt = SrtParser(subtitle_path)
         sentences = srt.extract_sentences()
         extracted_words = srt.extract_words(sentences)
         word_meanings = srt.dict_parser.searchdict(extracted_words)
-    return render_template("index.html", path=subtitle_path, word_meanings=word_meanings)
+    return render_template(
+        "index.html",
+        path=subtitle_path,
+        word_meanings=word_meanings,
+    )
 
 
 @app.route('/upload_file', methods=['GET', 'POST'])
