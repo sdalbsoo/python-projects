@@ -6,6 +6,7 @@ import requests
 
 import constants
 
+
 class NoMeaningWordException(Exception):
     def __init__(self, value="NoMeaningWordException"):
         self.value = value
