@@ -27,9 +27,11 @@ def allowed_file(filename):
 def index():
     return render_template('home.html')
 
+
 @app.route("/about")
 def about():
     return render_template('about.html')
+
 
 @app.route("/subtitle_dictionary")
 def subtitle_dictionary():
@@ -63,4 +65,4 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True, port=8080)
