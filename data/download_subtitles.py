@@ -1,21 +1,22 @@
 import time
+from bs4 import BeautifulSoup
+import requests
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+
+list_urls = []
+for i in range(10):
+    resp = requests.get("https://english-subtitles.org/page/{}".format(i+1))
+    source = resp.text
+    soup = BeautifulSoup(source, "lxml")
+    parsed = [i for i in soup.find_all("div", attrs={"class": "tbl"})]
+    for j in parsed:
+        list_urls.append(j.find('a')['href'])
 
 driver = webdriver.Chrome("/Users/Sdalbsoo/Downloads/chromedriver")
-driver.get("https://english-subtitles.org/")
-
-open_subtitle = "//div[@class='opener']"
-driver.find_element_by_xpath(open_subtitle).click()
-
-ready_subtitle= "//input[@class='downloadlink']"
-driver.find_element_by_xpath(ready_subtitle).click()
-
-download_subtitle= "//input[@class='downloadlink' and @type='submit']"
-driver.find_element_by_xpath(download_subtitle).click()
-
-go_home = "//a[@id='logo']"
-driver.find_element_by_xpath(go_home).click()
-
-time.sleep(10)
-driver.quit()
+for i in list_urls:
+    driver.get(i)
+    driver.find_element_by_css_selector("input.downloadlink").click()
+    driver.find_element_by_css_selector("input.downloadlink").click()
+    driver.find_element_by_css_selector("a#logo").click()
+    time.sleep(5)
+driver.close()
