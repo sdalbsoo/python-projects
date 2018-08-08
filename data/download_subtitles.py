@@ -1,4 +1,6 @@
 import time
+
+import argparse
 from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
@@ -18,16 +20,23 @@ def get_url():
 
 
 def main():
-    driver = webdriver.Chrome("/Users/Sdalbsoo/Downloads/chromedriver")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--path_chromedriver", type=str, required=True, help="Need to get path of chromedriver")  # noqa
+    parser.add_argument("-s", "--sleep", type=int, required=True, help="Need to get sleep time")  # noqa
+    args = parser.parse_args()
+
+    path = args.path_chromedriver
+    sleep_time = args.sleep
+
+    driver = webdriver.Chrome(path)
     elements_css_selector = [
         "input.downloadlink", "input.downloadlink", "a#logo",
     ]
-
     for url in get_url():
         driver.get(url)
         for i in elements_css_selector:
             driver.find_element_by_css_selector(i).click()
-        time.sleep(5)
+        time.sleep(sleep_time)
     driver.close()
 
 
