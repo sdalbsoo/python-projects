@@ -26,7 +26,7 @@ class SubtitleParser():
 
     def remove_tag(self, text):
         cleaner = re.compile("<.*?>")
-        clean_text = re.sub(cleaner, "", text)
+        clean_text = re.sub(cleaner, " ", text)
         return clean_text
 
     def extract_meanings(self, words):
@@ -72,11 +72,31 @@ class SrtParser(SubtitleParser):
 
 
 class SmiParser(SubtitleParser):
-    def __init__(self):
-        pass
+    def __init__(self, srt_path):
+        super(SmiParser, self).__init__()
+        with open(srt_path, "r") as f:
+            replace_words = [
+                ",", ".", "!", "?", '"', '-', '#', ":",
+                "=", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                "&nbsp", "krcc"
+            ]
+            content = f.read()
+            for replace_word in replace_words:
+                content = content.replace(replace_word, "")
+            self.lines = content.lower().splitlines()
 
     def extract_sentences(self):
-        pass
+        sentences = []
+        for line in self.lines:
+            tag_line = self.remove_tag(line)
+            line = self.remove_style(tag_line)
+            sentences.append(line)
+        return sentences
+
+    def remove_style(self, text):
+        cleaner = re.compile("{.*?}")
+        clean_text = re.sub(cleaner, "", text)
+        return clean_text
 
 
 class DictParser():
@@ -98,23 +118,22 @@ class DictParser():
                     raise NoMeaningWordException(f"NoMeaningWordException: No meaning for this word: {repr(word)}: {url}")  # noqa
                 meanings = [t.text for t in mdiv.find_all("li")]
                 meaning_words[word] = meanings
-                print(word, meanings)
             except NoMeaningWordException as e:
                 print(e)
         return meaning_words
 
-    def remove_tag(self, text):
-        cleaner = re.compile("<.*?>")
-        clean_text = re.sub(cleaner, "", text)
-        return clean_text
-
 
 def main():
-    srt_path = "../data/srt/ironman.srt"
-    srt = SrtParser(srt_path)
-    sentences = srt.extract_sentences()
-    extracted_words = srt.extract_words(sentences)
-    meanings = srt.dict_parser.searchdict(extracted_words)
+    # srt_path = "../data/srt/lionking.srt"
+    # srt = SrtParser(srt_path)
+    # sentences = srt.extract_sentences()
+    # extracted_words = srt.extract_words(sentences)
+    # meanings = srt.dict_parser.searchdict(extracted_words)
+    smi_path = "../data/smi/intern.smi"
+    smi = SmiParser(smi_path)
+    sentences = smi.extract_sentences()
+    extracted_words = smi.extract_words(sentences)
+    meanings = smi.dict_parser.searchdict(extracted_words)
     print(meanings)
 
 

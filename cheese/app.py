@@ -8,10 +8,11 @@ from flask import redirect
 from flask import url_for
 
 from cheese import SrtParser
+from cheese import SmiParser
 
 
 UPLOAD_FOLDER = '/Users/Sdalbsoo/workspace/python-projects/cheese/files'
-ALLOWED_EXTENSIONS = set(['srt'])
+ALLOWED_EXTENSIONS = set(['srt', 'smi'])
 
 
 app = Flask(__name__)
@@ -25,6 +26,16 @@ def allowed_file(filename):
 
 @app.route("/")
 def index():
+    return render_template('home.html')
+
+
+@app.route("/about")
+def about():
+    return render_template('about.html')
+
+
+@app.route("/subtitle_dictionary")
+def subtitle_dictionary():
     subtitle_path = request.args.get("path", None)
     word_meanings = None
     if subtitle_path is not None:
@@ -47,8 +58,12 @@ def upload_file():
             filename = secure_filename(file.filename)
             path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(path)
-            return redirect(url_for('index', path=path))
+            return redirect(url_for('subtitle_dictionary', path=path))
         else:
             return "Now allowed file"
     else:
         return "Something Wrong"
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True, port=8080)
