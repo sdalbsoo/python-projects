@@ -11,7 +11,7 @@ def get_urls():
         resp = requests.get("https://english-subtitles.org/page/{}".format(i+1))  # noqa
         source = resp.text
         soup = BeautifulSoup(source, "lxml")
-        parsed = [i for i in soup.find_all("div", attrs={"class": "tbl"})]
+        parsed = [k for k in soup.find_all("div", attrs={"class": "tbl"})]
         for j in parsed:
             yield j.find("a")["href"]
 
@@ -24,19 +24,24 @@ def argparser():
     return args
 
 
-def main():
-    args = argparser()
-    driver = webdriver.Chrome(args.path_chromedriver)
-
+def execute_downloading():
     elements_css_selector = [
         "input.downloadlink", "input.downloadlink", "a#logo",
     ]
+
+    args = argparser()
+    driver = webdriver.Chrome(args.path_chromedriver)
+
     for url in get_urls():
         driver.get(url)
         for i in elements_css_selector:
             driver.find_element_by_css_selector(i).click()
         time.sleep(args.sleep)
     driver.close()
+
+
+def main():
+    execute_downloading()
 
 
 if __name__ == "__main__":
