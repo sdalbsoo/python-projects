@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% block body %}
+<html>
+  <head>
+    <style>
+.check_file > input {
+  display: inline-block;
+  padding: .5em .75em;
+  color: #999;
+  line-height: normal;
+  vertical-align: middle;
+  background-color: #fdfdfd;
+  cursor: pointer;
+  border: 1px solid #ebebeb;
+  border-bottom-color: #e2e2e2;
+  border-radius: .25em;
+}
+    </style>
+  </head>
+<body>
+  {% if path == None %}
+    <h1>Please upload your subtitles</h1>
+    <div>
+      <form class="check_file" action="/upload_file" method=post enctype=multipart/form-data>
+        <label for="file">Choose a file to upload(srt, smi): </label>
+        <input id="file" type=file name=file accept=".srt, .smi"><br>
+        <label>Check your dictionary: </label>
+        <input type=submit value="Check">
+      </form>
+    </div>
+  {% else %}
+    <h1> Dictionary for you! </h1>
+    {% for word, meaning in word_meanings.items() %}
+      <h3> {{ word }} </h3>
+      <p> {{ meaning }} </p>
+    {% endfor %}
+  {% endif %}
+</body>
+</html>
+{% endblock %}

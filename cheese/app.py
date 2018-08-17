@@ -44,7 +44,7 @@ def subtitle_dictionary():
         extracted_words = srt.extract_words(sentences)
         word_meanings = srt.dict_parser.searchdict(extracted_words)
     return render_template(
-        "index.html",
+        "subtitle.html",
         path=subtitle_path,
         word_meanings=word_meanings,
     )

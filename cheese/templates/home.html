@@ -1,8 +1,27 @@
+<html>
+  <head>
+    <!-- text-center -->
+    <style>
+div > h1 {
+  color: red;
+}
+    </style>
+  </head>
+  <body>
   {% extends 'layout.html' %}
 
-  {% block body %}
-  <div class="text-center">
-    <h1>Welcome to Subtitle-Dictionary</h1>
-    <p class="lead">It is an application that makes a dictionary by using subtitle</p>
-  </div>
-  {% endblock %}
+    {% block body %}
+    <div class="text-center">
+      <h1>Welcome to Subtitle-Dictionary</h1>
+      <p class="lead">It is an application that makes a dictionary by using your subtitles</p>
+    </div>
+    <br>
+    <ul>
+      <h3>개선할 부분이 있다면 아래를 통해 연락주세요.</h3>
+      <li><a href="https://facebook.com/sdalbsoo">Facebook</p></li>
+      <li><a href="https://twitter.com/sdalbsoo">Twitter</p></li>
+      <li><a href="mailto:sdalbsoo@gmail.com">sdalbsoo@gmail.com</a></li>
+    </ul>
+    {% endblock %}
+  </body>
+</html>
