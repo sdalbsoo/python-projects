@@ -15,6 +15,40 @@
   border-bottom-color: #e2e2e2;
   border-radius: .25em;
 }
+table.table-set {
+  border-collapse: collapse;
+  text-align: center;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  margin: 20px 10px;
+}
+table.table-set thead {
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  background: #e7708d;
+}
+table.table-set thead th {
+  padding: 10px;
+  font-weight: bold;
+  vertical-align: top;
+  color: #fff;
+  text-align: center;
+}
+table.table-set tbody th {
+  width: 150px;
+  padding: 10px;
+  font-weight: bold;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+  background: #fcf1f4;
+  text-align: center;
+}
+table.table-set td {
+  width: 350px;
+  padding: 10px;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+}
     </style>
   </head>
 <body>
@@ -22,18 +56,30 @@
     <h1>Please upload your subtitles</h1>
     <div>
       <form class="check_file" action="/upload_file" method=post enctype=multipart/form-data>
-        <label for="file">Choose a file to upload(srt, smi): </label>
-        <input id="file" type=file name=file accept=".srt, .smi"><br>
+        <label for="file">Choose a file to upload(srt): </label>
+        <input id="file" type=file name=file accept=".srt"><br>
         <label>Check your dictionary: </label>
         <input type=submit value="Check">
       </form>
     </div>
   {% else %}
     <h1> Dictionary for you! </h1>
+      <table class="table-set">
+        <thead>
+        <tr>
+            <th scope="cols">word</th>
+            <th scope="cols">meaning</th>
+        </tr>
+        </thead>
     {% for word, meaning in word_meanings.items() %}
-      <h3> {{ word }} </h3>
-      <p> {{ meaning }} </p>
+        <tbody>
+        <tr>
+          <th scope="row">{{ word }}</th>
+          <td>{{ meaning }}</td>
+        </tr>
+        </tbody>
     {% endfor %}
+      </table>
   {% endif %}
 </body>
 </html>

@@ -1,8 +1,9 @@
 <html>
   <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <!-- text-center -->
     <style>
-div > h1 {
+div>h1.topic {
   color: red;
 }
     </style>
@@ -12,15 +13,17 @@ div > h1 {
 
     {% block body %}
     <div class="text-center">
-      <h1>Welcome to Subtitle-Dictionary</h1>
+      <h1 class="topic">Welcome to Subtitle-Dictionary</h1>
       <p class="lead">It is an application that makes a dictionary by using your subtitles</p>
     </div>
     <br>
+    <div>
+    </div>
     <ul>
       <h3>개선할 부분이 있다면 아래를 통해 연락주세요.</h3>
-      <li><a href="https://facebook.com/sdalbsoo">Facebook</p></li>
-      <li><a href="https://twitter.com/sdalbsoo">Twitter</p></li>
-      <li><a href="mailto:sdalbsoo@gmail.com">sdalbsoo@gmail.com</a></li>
+      <li><i class="fa fa-facebook"><a href="https://facebook.com/sdalbsoo"> Facebook</a></i></li>
+      <li><i class="fa fa-twitter"><a href="https://twitter.com/sdalbsoo"> Twitter</a></i></li>
+      <li><i class="fa fa-envelope"><a href="mailto:sdalbsoo@gmail.com"> sdalbsoo@gmail.com</a></i></li>
     </ul>
     {% endblock %}
   </body>
