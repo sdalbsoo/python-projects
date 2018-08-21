@@ -1,8 +1,16 @@
-{% extends 'layout.html' %}
-{% block body %}
 <html>
   <head>
     <style>
+{% extends 'layout.html' %}
+{% block body %}
+.fas.fa-print {
+  size: 3px;
+}
+@media print {
+  .print-button {
+  display: none;
+  }
+}
 .check_file > input {
   display: inline-block;
   padding: .5em .75em;
@@ -33,6 +41,8 @@ table.table-set thead th {
   vertical-align: top;
   color: #fff;
   text-align: center;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 table.table-set tbody th {
   width: 150px;
@@ -40,6 +50,7 @@ table.table-set tbody th {
   font-weight: bold;
   vertical-align: top;
   border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
   background: #fcf1f4;
   text-align: center;
 }
@@ -48,38 +59,41 @@ table.table-set td {
   padding: 10px;
   vertical-align: top;
   border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
 }
     </style>
   </head>
 <body>
   {% if path == None %}
-    <h1>Please upload your subtitles</h1>
+    <h1>자막 파일을 이용한 단어장 만들기</h1>
     <div>
       <form class="check_file" action="/upload_file" method=post enctype=multipart/form-data>
-        <label for="file">Choose a file to upload(srt): </label>
-        <input id="file" type=file name=file accept=".srt"><br>
-        <label>Check your dictionary: </label>
-        <input type=submit value="Check">
+        <label for="file">자막 파일 업로드(srt파일만 가능): </label>
+        <input id="file" type=file name=file accept=".srt" required multiple><br>
+        <label>단어장 생성: </label>
+        <input type=submit value="단어장 만들기">
       </form>
     </div>
   {% else %}
-    <h1> Dictionary for you! </h1>
-      <table class="table-set">
-        <thead>
-        <tr>
-            <th scope="cols">word</th>
-            <th scope="cols">meaning</th>
-        </tr>
-        </thead>
-    {% for word, meaning in word_meanings.items() %}
-        <tbody>
-        <tr>
-          <th scope="row">{{ word }}</th>
-          <td>{{ meaning }}</td>
-        </tr>
-        </tbody>
-    {% endfor %}
-      </table>
+  <input type="text" id="file" size="50" placeholder="Write your subtitle file-name" autofocus>
+  <p id="demo"></p>
+    <table class="table-set">
+      <thead>
+      <tr>
+          <th scope="cols">단어</th>
+          <th scope="cols">뜻</th>
+      </tr>
+      </thead>
+      {% for word, meaning in word_meanings.items() %}
+      <tbody>
+      <tr>
+        <th scope="row">{{ word }}</th>
+        <td>{{ (' ').join(meaning) }}</td>
+      </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+    <button onclick="window.print()" class="print-button"><i class="fas fa-facebook"></i>Print</button>
   {% endif %}
 </body>
 </html>
