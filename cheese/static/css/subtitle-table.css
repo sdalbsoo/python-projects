@@ -1,0 +1,58 @@
+.fas.fa-print {
+  size: 3px;
+}
+@media print {
+  .print-button {
+  display: none;
+  }
+}
+.check_file > input {
+  display: inline-block;
+  padding: .5em .75em;
+  color: #999;
+  line-height: normal;
+  vertical-align: middle;
+  background-color: #fdfdfd;
+  cursor: pointer;
+  border: 1px solid #ebebeb;
+  border-bottom-color: #e2e2e2;
+  border-radius: .25em;
+}
+table.table-set {
+  border-collapse: collapse;
+  text-align: center;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  margin: 20px 10px;
+}
+table.table-set thead {
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  background: #e7708d;
+}
+table.table-set thead th {
+  padding: 10px;
+  font-weight: bold;
+  vertical-align: top;
+  color: #fff;
+  text-align: center;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+table.table-set tbody th {
+  width: 150px;
+  padding: 10px;
+  font-weight: bold;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  background: #fcf1f4;
+  text-align: center;
+}
+table.table-set td {
+  width: 350px;
+  padding: 10px;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+};
