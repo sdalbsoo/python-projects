@@ -3,14 +3,25 @@
   <head>
     <meta charset="utf-8">
     <title>Make a dictionary</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/footer.css">
+    {% block style %}{% endblock %}
   </head>
   <body>
-    {% include 'includes/_navbar.html' %}
-    <div class="container">
+   <div class="container">
+      <nav class="navbar navbar-default">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">My Dictionary</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/about">About</a></li>
+            <li><a href="/subtitle_dictionary">Subtitle Dictionary</a></li>
+          </ul>
+        </div>
+      </nav>
       {% block body %}{% endblock %}
     </div>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
-    </script>
   </body>
 </html>

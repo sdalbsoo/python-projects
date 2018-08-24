@@ -1,100 +1,39 @@
-<html>
-  <head>
-    <style>
 {% extends 'layout.html' %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="../static/css/subtitle-table.css">
+{% endblock %}
 {% block body %}
-.fas.fa-print {
-  size: 3px;
-}
-@media print {
-  .print-button {
-  display: none;
-  }
-}
-.check_file > input {
-  display: inline-block;
-  padding: .5em .75em;
-  color: #999;
-  line-height: normal;
-  vertical-align: middle;
-  background-color: #fdfdfd;
-  cursor: pointer;
-  border: 1px solid #ebebeb;
-  border-bottom-color: #e2e2e2;
-  border-radius: .25em;
-}
-table.table-set {
-  border-collapse: collapse;
-  text-align: center;
-  line-height: 1.5;
-  border: 1px solid #ccc;
-  margin: 20px 10px;
-}
-table.table-set thead {
-  border-right: 1px solid #ccc;
-  border-left: 1px solid #ccc;
-  background: #e7708d;
-}
-table.table-set thead th {
-  padding: 10px;
-  font-weight: bold;
-  vertical-align: top;
-  color: #fff;
-  text-align: center;
-  border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-}
-table.table-set tbody th {
-  width: 150px;
-  padding: 10px;
-  font-weight: bold;
-  vertical-align: top;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  background: #fcf1f4;
-  text-align: center;
-}
-table.table-set td {
-  width: 350px;
-  padding: 10px;
-  vertical-align: top;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-}
-    </style>
-  </head>
-<body>
   {% if path == None %}
     <h1>자막 파일을 이용한 단어장 만들기</h1>
     <div>
       <form class="check_file" action="/upload_file" method=post enctype=multipart/form-data>
-        <label for="file">자막 파일 업로드(srt파일만 가능): </label>
+        <label for="file">자막 파일 업로드(srt파일만 가능): </label><br>
         <input id="file" type=file name=file accept=".srt" required multiple><br>
-        <label>단어장 생성: </label>
+        <label>단어장 생성: </label><br>
         <input type=submit value="단어장 만들기">
       </form>
     </div>
   {% else %}
   <input type="text" id="file" size="50" placeholder="Write your subtitle file-name" autofocus>
-  <p id="demo"></p>
-    <table class="table-set">
-      <thead>
-      <tr>
+    <p id="demo"></p>
+      <table class="table-set">
+        <thead>
+        <tr>
+          <th scope="cols">번호</th>
           <th scope="cols">단어</th>
           <th scope="cols">뜻</th>
-      </tr>
-      </thead>
-      {% for word, meaning in word_meanings.items() %}
-      <tbody>
-      <tr>
-        <th scope="row">{{ word }}</th>
-        <td>{{ (' ').join(meaning) }}</td>
-      </tr>
-      </tbody>
-      {% endfor %}
-    </table>
-    <button onclick="window.print()" class="print-button"><i class="fas fa-facebook"></i>Print</button>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        {% for word, meaning in word_meanings.items() %}
+          <th class="loop-index">{{ loop.index }}</th>
+          <th>{{ word }}</th>
+          <td>{{ (' ').join(meaning) }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    <button onclick="window.print()" class="print-button">Print</button>
   {% endif %}
-</body>
-</html>
 {% endblock %}

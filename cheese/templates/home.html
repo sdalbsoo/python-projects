@@ -1,30 +1,34 @@
-<html>
-  <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <!-- text-center -->
-    <style>
-div>h1.topic {
-  color: red;
-}
-    </style>
-  </head>
-  <body>
-  {% extends 'layout.html' %}
-
-    {% block body %}
-    <div class="text-center">
-      <h1 class="topic">Welcome to Subtitle-Dictionary</h1>
-      <p class="lead">It is an application that makes a dictionary by using your subtitles</p>
-    </div>
-    <br>
-    <div>
-    </div>
-    <ul>
-      <h3>개선할 부분이 있다면 아래를 통해 연락주세요.</h3>
-      <li><i class="fa fa-facebook"><a href="https://facebook.com/sdalbsoo"> Facebook</a></i></li>
-      <li><i class="fa fa-twitter"><a href="https://twitter.com/sdalbsoo"> Twitter</a></i></li>
-      <li><i class="fa fa-envelope"><a href="mailto:sdalbsoo@gmail.com"> sdalbsoo@gmail.com</a></i></li>
-    </ul>
-    {% endblock %}
-  </body>
-</html>
+{% extends 'layout.html' %}
+{% block style %}
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+  integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+  <style>
+    div>h1.topic {
+    color: red;
+    }
+  </style>
+{% endblock %}
+{% block body %}
+  <div class="text-center">
+    <h1 class="topic">Cheese에 오신걸 환영합니다.</h1></h1>
+    <p class="lead">치즈는 당신의 영어 자막 파일을 단어장으로 만들어 드립니다.</p>
+  </div>
+  <div class="explain">
+    <ol>
+      <li> 위의 목록에서 Subtitle-Dictionary를 클릭한다.</li>
+      <li> 자신의 영어자막 파일을 업로드한 뒤 단어장 만들기 버튼을 클릭한다.</li>
+      <li> 맨 위에 자신의 영어 제목을 작성한다.</li>
+      <li> 맨 아래 프린트 버튼을 클릭하여 자신의 프린터기에 맞게 출력한다.</li>
+    </ol>
+  </div>
+  <br>
+  <div>
+  </div>
+  <hr>
+  <ul>
+    <h3>개선할 부분이 있다면 아래를 통해 연락주세요.</h3>
+    <li><i class="fab fa-facebook-square"></i><a href="https://facebook.com/sdalbsoo"> Facebook</a></li>
+    <li><i class="fab fa-twitter-square"></i><a href="https://twitter.com/sdalbsoo"> Twitter</a></li>
+    <li><i class="fas fa-envelope-square"></i><a href="mailto:sdalbsoo@gmail.com"> sdalbsoo@gmail.com</a></li>
+  </ul>
+{% endblock %}
