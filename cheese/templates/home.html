@@ -2,18 +2,28 @@
 {% block style %}
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
   integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+  <link href="http://fonts.googleapis.com/earlyaccess/notosanskr.css" rel="stylesheet">
   <style>
     div>h1.topic {
-    color: red;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: red;
+    }
+    p {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    li {
+      font-family: 'Noto Sans KR', sans-serif;
     }
   </style>
 {% endblock %}
+<style>
+</style>
 {% block body %}
   <div class="text-center">
     <h1 class="topic">Cheese에 오신걸 환영합니다.</h1></h1>
-    <p class="lead">치즈는 당신의 영어 자막 파일을 단어장으로 만들어 드립니다.</p>
+    <p class="lead font-weight-bold">치즈는 당신의 영어 자막 파일을 단어장으로 만들어 드립니다.</p>
   </div>
-  <div class="explain">
+  <div class="explain font-weight-light">
     <ol>
       <li> 위의 목록에서 Subtitle-Dictionary를 클릭한다.</li>
       <li> 자신의 영어자막 파일을 업로드한 뒤 단어장 만들기 버튼을 클릭한다.</li>
@@ -22,8 +32,6 @@
     </ol>
   </div>
   <br>
-  <div>
-  </div>
   <hr>
   <ul>
     <h3>개선할 부분이 있다면 아래를 통해 연락주세요.</h3>
