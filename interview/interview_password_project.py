@@ -3,7 +3,7 @@ import os
 import pymysql
 
 
-class connectDB():
+class ConnectDB():
     def __init__(self, host, user, password):
         self.host, self.user, self.password = host, user, password
         self.conn = pymysql.connect(host=host, user=user, password=password)
@@ -34,7 +34,7 @@ def signup(user_id, user_password):
     salt = service_salt_bytes + user_salt_bytes
     user_digest = hashlib.pbkdf2_hmac('sha256', user_password_bytes, salt, 1)
 
-    with connectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
+    with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
         cursor = conDB.conn.cursor()
         cursor.execute("USE interview_password_project")
         sql = "INSERT INTO id_password (user_id, user_salt, user_digest) VALUES (%s, %s, %s);"  # noqa
@@ -47,14 +47,14 @@ def login(user_id, user_password):
     service_salt_bytes = make_service_salt()
     user_password_bytes = user_password.encode('utf-8')
 
-    with connectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
+    with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
         cursor = conDB.conn.cursor()
         cursor.execute("USE interview_password_project")
         cursor.execute("SELECT user_id, user_salt, user_digest FROM id_password WHERE user_id=%s", user_id)  # noqa
         user = cursor.fetchone()
         if user:
             user_salt_bytes = user[1].encode('utf-8')
-            salt = service_salt_bytes+user_salt_bytes
+            salt = service_salt_bytes + user_salt_bytes
             user_digest = hashlib.pbkdf2_hmac('sha256', user_password_bytes, salt, 1)  # noqa
             if(str(user_digest) == user[2]):
                 print(f"{user_id} 로그인 성공!")
@@ -73,7 +73,7 @@ def make_service_salt():
 
 
 def main():
-    # with connectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
+    # with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
         # conDB.create_table()
     # signup('sdalbsoo', 'hi')
     # signup('sbs', 'handsome')
