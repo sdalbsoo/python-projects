@@ -8,7 +8,6 @@ from flask import redirect
 from flask import url_for
 
 from cheese import SrtParser
-from cheese import SmiParser
 
 
 UPLOAD_FOLDER = '/Users/Sdalbsoo/workspace/python-projects/cheese/files'
