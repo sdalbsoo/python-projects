@@ -1,7 +1,5 @@
-from contextlib import contextmanager
 from pathlib import Path
 import argparse
-import time
 import os
 
 import mysql.connector
@@ -68,15 +66,15 @@ def requirement1(
                     req1.cleanup_rows_inplace(rows)
                 req1.insert_bulk(cnx, cursor, table, rows, chunk_size)
 
-    cursor.execute("alter table attribute add constraint foreign key (business_id) references business(id);")
-    cursor.execute("alter table category add constraint foreign key (business_id) references business(id);")
-    cursor.execute("alter table checkin add constraint foreign key (business_id) references business(id);")
-    cursor.execute("alter table photo add constraint foreign key (business_id) references business(id);")
-    cursor.execute("alter table review add constraint foreign key (business_id) references business(id);")
-    cursor.execute("alter table review add constraint foreign key (user_id) references user(id);")
-    cursor.execute("alter table tip add constraint foreign key (business_id) references business(id);")
-    cursor.execute("alter table tip add constraint foreign key (user_id) references user(id);")
-    cursor.execute("alter table vip_history add constraint foreign key (user_id) references user(id);")
+    cursor.execute("alter table attribute add constraint foreign key (business_id) references business(id);")  # noqa
+    cursor.execute("alter table category add constraint foreign key (business_id) references business(id);")  # noqa
+    cursor.execute("alter table checkin add constraint foreign key (business_id) references business(id);")  # noqa
+    cursor.execute("alter table photo add constraint foreign key (business_id) references business(id);")  # noqa
+    cursor.execute("alter table review add constraint foreign key (business_id) references business(id);")  # noqa
+    cursor.execute("alter table review add constraint foreign key (user_id) references user(id);")  # noqa
+    cursor.execute("alter table tip add constraint foreign key (business_id) references business(id);")  # noqa
+    cursor.execute("alter table tip add constraint foreign key (user_id) references user(id);")  # noqa
+    cursor.execute("alter table vip_history add constraint foreign key (user_id) references user(id);")  # noqa
 
     cnx.close()
     cursor.close()
@@ -191,7 +189,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", default="localhost", type=str)
     parser.add_argument("--user", default="root", type=str)
-    parser.add_argument("--password", default=os.environ["DB_PASSWORD"], type=str)
+    parser.add_argument("--password", default=os.environ["DB_PASSWORD"],
+                        type=str)
     parser.add_argument("--directory_in", default="./DMA_datafiles", type=str)
     parser.add_argument("--requirements", nargs="*", default=[1], type=int)
 

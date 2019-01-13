@@ -1,8 +1,6 @@
 from tqdm import tqdm
 from loguru import logger
 
-from db.utils import timeit_context
-
 
 def create_tables(cursor):
     cursor.execute("""create table if not exists user(
@@ -107,7 +105,8 @@ def insert_bulk(
     cursor,
     table_name,
     rows,
-    chunk_size=100000):
+    chunk_size=100000
+):
     ncols = len(rows[0])
     nrows = len(rows)
     colstring = ", ".join(["%s"] * ncols)
