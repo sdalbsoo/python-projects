@@ -96,7 +96,8 @@ def requirement3():
     FROM business
     WHERE id IN (
     SELECT business_id
-    FROM (SELECT business_id, count(*) AS count_reviews, AVG(stars) AS avg_stars
+    FROM (SELECT business_id, count(*) AS count_reviews, AVG(stars)
+                   AS avg_stars
             FROM review
             WHERE business_id IN (SELECT business_id FROM category
             WHERE category = 'Restaurants')
