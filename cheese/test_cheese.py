@@ -26,6 +26,7 @@ def test_srt_extract_words():
     srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"))
     sentences = srt_parser.extract_sentences()
     words = srt_parser.extract_words(sentences)
+    words.pop('')
     assert words == {"day": 1, "arrive": 1,
                      "planet": 1, "blinking": 1, "see": 1, "step": 1, "sun": 1,
                      }
@@ -34,23 +35,23 @@ def test_srt_extract_words():
 def test_srt_extract_sentence():
     srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"))
     sentences = srt_parser.extract_sentences()
-    assert sentences == ["from the day we arrive",
-                         "on the planet",
-                         "and blinking step into the sun",
-                         "there's more to see",
+    assert sentences == [" from the day we arrive ",
+                         " on the planet ",
+                         " and blinking step into the sun ",
+                         " there's more to see ",
                          ]
 
 
 def test_remove_tag():
     sub = SubtitleParser()
     sub_line = sub.remove_tag("<i>There's more to see</i>")
-    assert sub_line == "There's more to see"
+    assert sub_line == " There's more to see "
 
     sub_line = sub.remove_tag("<i>There's more to see</i>")
-    assert sub_line == "There's more to see"
+    assert sub_line == " There's more to see "
 
     sub_line = sub.remove_tag("<p>There's more to see</p>")
-    assert sub_line == "There's more to see"
+    assert sub_line == " There's more to see "
 
-    sub_line = sub.remove_tag("<p>>There's more to see</p>")
-    assert sub_line == ">There's more to see"
+    sub_line = sub.remove_tag("<p>There's more to see</p>")
+    assert sub_line == " There's more to see "
