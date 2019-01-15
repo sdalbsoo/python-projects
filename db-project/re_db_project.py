@@ -164,7 +164,7 @@ def requirement4():
     or id IN (
     SELECT business_id
     FROM attribute
-    WHERE description = 'none'
+    WHERE characteristic = 'none'
     )
     ORDER BY id ASC;""")
     result = cursor.fetchall()
