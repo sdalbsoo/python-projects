@@ -34,7 +34,12 @@ def about():
     return render_template('about.html')
 
 
-@app.route("/subtitle_dictionary")
+@app.route("/contact")
+def contact():
+    return render_template('./contact.html')
+
+
+@app.route("/subtitle")
 def subtitle_dictionary():
     subtitle_path = request.args.get("path", None)
     word_meanings = None
