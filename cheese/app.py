@@ -8,10 +8,13 @@ from flask import redirect
 from flask import url_for
 
 from cheese import SrtParser
+from cheese import ConnectDB
 
 
-UPLOAD_FOLDER = '/Users/Sdalbsoo/workspace/python-projects/cheese/files'
+UPLOAD_FOLDER = '../cheese/files'
 ALLOWED_EXTENSIONS = set(['srt', 'smi'])
+USER = "your SQL user"
+PASSWORD = "your SQL password"
 
 
 app = Flask(__name__)
@@ -43,10 +46,12 @@ def subtitle_dictionary():
     subtitle_path = request.args.get("path", None)
     word_meanings = None
     if subtitle_path is not None:
-        srt = SrtParser(subtitle_path)
+        conDB = ConnectDB("localhost", USER, PASSWORD)
+        conDB.create_table()
+        srt = SrtParser(subtitle_path, conDB)  # noqa
         sentences = srt.extract_sentences()
         extracted_words = srt.extract_words(sentences)
-        word_meanings = srt.dict_parser.searchdict(extracted_words)
+        word_meanings = srt.dict_parser.search_dict(extracted_words, conDB)  # noqa
     return render_template(
         "subtitle.html",
         path=subtitle_path,

@@ -1,10 +1,15 @@
+import os
+
+import requests
+import pymysql
 import re
 from abc import abstractmethod
 from bs4 import BeautifulSoup
-
-import requests
+from tqdm import tqdm
 
 import constants
+from connectDB import ConnectDB
+from utils import time_manager
 
 
 class NoMeaningWordException(Exception):
@@ -30,7 +35,7 @@ class SubtitleParser():
         return clean_text
 
     def extract_meanings(self, words):
-        return self.dict_parser.searchdict(words)
+        return self.dict_parser.search_dict(words)
 
     def extract_words(self, sentences):
         words = {}
@@ -46,16 +51,20 @@ class SubtitleParser():
 
 
 class SrtParser(SubtitleParser):
-    def __init__(self, srt_path):
+    def __init__(self, srt_path, conDB):
         super(SrtParser, self).__init__()
-        with open(srt_path, "r") as f:
-            replace_words = [
-                ",", ".", "!", "?", '"',
-            ]
-            content = f.read()
-            for replace_word in replace_words:
-                content = content.replace(replace_word, "")
-            self.lines = content.lower().splitlines()
+        self.conDB = conDB
+        with time_manager("필요없는 문자 지우기"):
+            with open(srt_path, "r") as f:
+                replace_words = [
+                    ",", ".", "!", "?", '"', "(", ")", ":", "'s", "-", "--",
+                    "=", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                    "[", "]", "/", "'d", "'ll", "'d", "'ve",
+                ]
+                content = f.read()
+                for replace_word in replace_words:
+                    content = content.replace(replace_word, "")
+                self.lines = content.lower().splitlines()
 
     def extract_sentences(self):
         sentences = []
@@ -67,8 +76,13 @@ class SrtParser(SubtitleParser):
             if len(line) == 0:
                 continue
             line = self.remove_tag(line)
+            if line == " > ":
+                continue
             sentences.append(line)
         return sentences
+
+    def extract_meanings(self, words):
+        return self.dict_parser.search_dict(words, self.conDB)
 
 
 class SmiParser(SubtitleParser):
@@ -103,38 +117,49 @@ class DictParser():
     def __init__(self):
         self.daum_url = "http://alldic.daum.net/search.do?q={}"
 
-    def searchdict(self, extracted_words):
+    def parse_mdiv(self, url):
+        source = requests.get(url).text
+        soup = BeautifulSoup(source, "lxml")
+        mdiv = soup.find(
+            "div",
+            attrs={"class": "cleanword_type kuek_type"}
+        )
+        return mdiv
+
+    def search_dict(self, extracted_words, conDB):
+        count = 0
         meaning_words = {}
-        for i, word in enumerate(extracted_words):
-            try:
-                url = self.daum_url.format(word)
-                source = requests.get(url).text
-                soup = BeautifulSoup(source, "lxml")
-                mdiv = soup.find(
-                    "div",
-                    attrs={"class": "cleanword_type kuek_type"}
-                )
-                if mdiv is None:
-                    raise NoMeaningWordException(f"NoMeaningWordException: No meaning for this word: {repr(word)}: {url}")  # noqa
-                meanings = [t.text for t in mdiv.find_all("li")]
-                meaning_words[word] = meanings
-            except NoMeaningWordException as e:
-                print(e)
+        with time_manager("Search dictionary!"):
+            for word in tqdm(extracted_words):
+                if conDB.search_exiting_dict(word) is None:
+                    try:
+                        url = self.daum_url.format(word)
+                        mdiv = self.parse_mdiv(url)
+                        if mdiv is None:
+                            raise NoMeaningWordException(f"NoMeaningWordException: No meaning for this word: {repr(word)}: {url}")  # noqa
+                        meanings = [t.text for t in mdiv.find_all("li")]
+                        conDB.insert_words_table(word, meanings)
+                        meaning_words[word] = meanings
+                    except NoMeaningWordException as e:
+                        print(e)
+                else:
+                    count += 1
+                    sql_meaning = (conDB.search_exiting_dict(word)[1])
+                    meaning_words[word] = sql_meaning
+        conDB.insert_subdata_table((count/len(extracted_words)*100), count)
         return meaning_words
 
 
 def main():
-    # srt_path = "../data/srt/lionking.srt"
-    # srt = SrtParser(srt_path)
-    # sentences = srt.extract_sentences()
-    # extracted_words = srt.extract_words(sentences)
-    # meanings = srt.dict_parser.searchdict(extracted_words)
-    smi_path = "../data/smi/intern.smi"
-    smi = SmiParser(smi_path)
-    sentences = smi.extract_sentences()
-    extracted_words = smi.extract_words(sentences)
-    meanings = smi.dict_parser.searchdict(extracted_words)
-    print(meanings)
+    with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
+        conDB.create_table()
+        srt_path = "../data/srt/lionking.srt"  # noqa
+        srt = SrtParser(srt_path, conDB)
+        sentences = srt.extract_sentences()
+        extracted_words = srt.extract_words(sentences)
+        print(extracted_words)
+        words_meanings = srt.dict_parser.search_dict(extracted_words, conDB)
+        print(words_meanings)
 
 
 if __name__ == "__main__":
