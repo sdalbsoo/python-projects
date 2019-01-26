@@ -1,7 +1,6 @@
 import os
 
 import requests
-import pymysql
 import re
 from abc import abstractmethod
 from bs4 import BeautifulSoup

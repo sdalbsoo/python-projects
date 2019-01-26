@@ -7,7 +7,6 @@ from connectDB import ConnectDB
 import constants
 
 
-
 def test_srt_extract_meaning():
     with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
         conDB.cursor.execute("USE cheese_project")
@@ -34,21 +33,23 @@ def test_srt_extract_words():
         sentences = srt_parser.extract_sentences()
         words = srt_parser.extract_words(sentences)
         words.pop('')
-        assert words == {"day": 1, "arrive": 1,
-                        "planet": 1, "blinking": 1,
-                         "see": 1, "step": 1, "sun": 1,
-                        }
+        assert words == {
+            "day": 1, "arrive": 1,
+            "planet": 1, "blinking": 1,
+            "see": 1, "step": 1, "sun": 1,
+        }
 
 
 def test_srt_extract_sentence():
     with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
         srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), conDB)  # noqa
         sentences = srt_parser.extract_sentences()
-        assert sentences == [" from the day we arrive ",
-                            " on the planet ",
-                            " and blinking step into the sun ",
-                            " there more to see ",
-                            ]
+        assert sentences == [
+            " from the day we arrive ",
+            " on the planet ",
+            " and blinking step into the sun ",
+            " there more to see ",
+        ]
 
 
 def test_remove_tag():
