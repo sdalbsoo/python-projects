@@ -1,5 +1,3 @@
-import os
-
 import requests
 import re
 from abc import abstractmethod
@@ -7,7 +5,6 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 import constants
-from connectDB import ConnectDB
 from utils import time_manager
 
 
@@ -147,19 +144,3 @@ class DictParser():
                     meaning_words[word] = sql_meaning
         conDB.insert_subdata_table((count/len(extracted_words)*100), count)
         return meaning_words
-
-
-def main():
-    with ConnectDB("localhost", os.environ["USER"], os.environ["PASSWORD"]) as conDB:  # noqa
-        conDB.create_table()
-        srt_path = "../data/srt/lionking.srt"  # noqa
-        srt = SrtParser(srt_path, conDB)
-        sentences = srt.extract_sentences()
-        extracted_words = srt.extract_words(sentences)
-        print(extracted_words)
-        words_meanings = srt.dict_parser.search_dict(extracted_words, conDB)
-        print(words_meanings)
-
-
-if __name__ == "__main__":
-    main()
