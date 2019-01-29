@@ -8,7 +8,7 @@ from flask import redirect
 from flask import url_for
 
 from cheese import SrtParser
-from cheese import ConnectDB
+from connectDB import ConnectDB
 import yaml
 
 

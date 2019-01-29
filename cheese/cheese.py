@@ -51,7 +51,7 @@ class SrtParser(SubtitleParser):
         super(SrtParser, self).__init__()
         self.conDB = conDB
         with time_manager("필요없는 문자 지우기"):
-            with open(srt_path, "r") as f:
+            with open(srt_path, "r", encoding="utf-8-sig") as f:
                 replace_words = [
                     ",", ".", "!", "?", '"', "(", ")", ":", "'s", "-", "--",
                     "=", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
