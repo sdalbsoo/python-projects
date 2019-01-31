@@ -6,10 +6,11 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask import url_for
+from flask import g
+import yaml
+import pymysql
 
 from cheese import SrtParser
-from connectDB import ConnectDB
-import yaml
 
 
 UPLOAD_FOLDER = "../cheese/files"
@@ -45,16 +46,12 @@ def subtitle_dictionary():
     subtitle_path = request.args.get("path", None)
     word_meanings = None
     if subtitle_path is not None:
-        with open("./config.yml", "r") as f:
-            data_map = yaml.load(f)
-            HOST = data_map["database"]["host"]
-            USER = data_map["database"]["user"]
-            PW = data_map["database"]["password"]
-        conDB = ConnectDB(HOST, USER, PW)
-        srt = SrtParser(subtitle_path, conDB)
-        sentences = srt.extract_sentences()
-        extracted_words = srt.extract_words(sentences)
-        word_meanings = srt.dict_parser.search_dict(extracted_words, conDB)  # noqa
+        with app.app_context():
+            conDB = get_db()
+            srt = SrtParser(subtitle_path, conDB)
+            sentences = srt.extract_sentences()
+            extracted_words = srt.extract_words(sentences)
+            word_meanings = srt.dict_parser.search_dict(extracted_words, conDB)  # noqa
     return render_template(
         "subtitle.html",
         path=subtitle_path,
@@ -72,9 +69,32 @@ def upload_file():
             file.save(path)
             return redirect(url_for("subtitle_dictionary", path=path))
         else:
-            return "Now allowed file"
+            return "Now llowed file"
     else:
         return "Something Wrong"
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    print("connect DB!")
+    with open("./config.yml", "r") as f:
+        data_map = yaml.load(f)
+        host = data_map["database"]["host"]
+        user = data_map["database"]["user"]
+        pw = data_map["database"]["password"]
+    if db is None:
+        db = g._database = pymysql.connect(
+            host=host, user=user, password=pw
+        )
+    return db
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        print("db close")
+        db.close()
 
 
 if __name__ == "__main__":

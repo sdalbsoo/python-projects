@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 import constants
+import connectDB as con
 from utils import time_manager
 
 
@@ -127,20 +128,20 @@ class DictParser():
         meaning_words = {}
         with time_manager("Search dictionary!"):
             for word in tqdm(extracted_words):
-                if conDB.search_exiting_dict(word) is None:
+                if con.search_exiting_dict(conDB, word) is None:
                     try:
                         url = self.daum_url.format(word)
                         mdiv = self.parse_mdiv(url)
                         if mdiv is None:
                             raise NoMeaningWordException(f"NoMeaningWordException: No meaning for this word: {repr(word)}: {url}")  # noqa
                         meanings = [t.text for t in mdiv.find_all("li")]
-                        conDB.insert_words_table(word, meanings)
+                        con.insert_words_table(conDB, word, meanings)
                         meaning_words[word] = meanings
                     except NoMeaningWordException as e:
                         print(e)
                 else:
                     count += 1
-                    sql_meaning = (conDB.search_exiting_dict(word)[1])
+                    sql_meaning = (con.search_exiting_dict(conDB, word)[1])
                     meaning_words[word] = sql_meaning
-        conDB.insert_subdata_table((count/len(extracted_words)*100), count)
+        con.insert_subdata_table(conDB, (count/len(extracted_words)*100), count)  # noqa
         return meaning_words
