@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 import constants
-import connectDB as con
+from db import search_exiting_dict, insert_ratio_table, insert_words_table
 from utils import time_manager
 
 
@@ -23,7 +23,7 @@ class NoMeaningWordException(Exception):
 class SubtitleParser():
     def __init__(self):
         self.dict_parser = DictParser()
-        with open(constants.PATH_STOPWORDS, "r") as f:
+        with open(constants.PATH_STOPWORDS, "r", encoding="utf-8-sig") as f:
             self.stopwords = set(f.read().splitlines())
 
     def remove_tag(self, text):
@@ -40,6 +40,7 @@ class SubtitleParser():
             for word in sentence.split(" "):
                 if word not in self.stopwords:
                     words[word] = words.get(word, 0) + 1
+        words.pop('', None)
         return words
 
     @abstractmethod
@@ -48,9 +49,9 @@ class SubtitleParser():
 
 
 class SrtParser(SubtitleParser):
-    def __init__(self, srt_path, conDB):
+    def __init__(self, srt_path, con_db):
         super(SrtParser, self).__init__()
-        self.conDB = conDB
+        self.con_db = con_db
         with time_manager("필요없는 문자 지우기"):
             with open(srt_path, "r", encoding="utf-8-sig") as f:
                 replace_words = [
@@ -79,13 +80,13 @@ class SrtParser(SubtitleParser):
         return sentences
 
     def extract_meanings(self, words):
-        return self.dict_parser.search_dict(words, self.conDB)
+        return self.dict_parser.search_dict(words, self.con_db)
 
 
 class SmiParser(SubtitleParser):
     def __init__(self, srt_path):
         super(SmiParser, self).__init__()
-        with open(srt_path, "r") as f:
+        with open(srt_path, "r", encoding="utf-8-sig") as f:
             replace_words = [
                 ",", ".", "!", "?", '"', '-', '#', ":",
                 "=", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
@@ -123,25 +124,25 @@ class DictParser():
         )
         return mdiv
 
-    def search_dict(self, extracted_words, conDB):
+    def search_dict(self, extracted_words, con_db):
         count = 0
         meaning_words = {}
         with time_manager("Search dictionary!"):
             for word in tqdm(extracted_words):
-                if con.search_exiting_dict(conDB, word) is None:
+                if search_exiting_dict(con_db, word) is None:
                     try:
                         url = self.daum_url.format(word)
                         mdiv = self.parse_mdiv(url)
                         if mdiv is None:
                             raise NoMeaningWordException(f"NoMeaningWordException: No meaning for this word: {repr(word)}: {url}")  # noqa
                         meanings = [t.text for t in mdiv.find_all("li")]
-                        con.insert_words_table(conDB, word, meanings)
+                        insert_words_table(con_db, word, meanings)
                         meaning_words[word] = meanings
                     except NoMeaningWordException as e:
                         print(e)
                 else:
                     count += 1
-                    sql_meaning = (con.search_exiting_dict(conDB, word)[1])
+                    sql_meaning = (search_exiting_dict(con_db, word)[1])
                     meaning_words[word] = sql_meaning
-        con.insert_subdata_table(conDB, (count/len(extracted_words)*100), count)  # noqa
+        insert_ratio_table(con_db, (count / len(extracted_words) * 100), count)  # noqa
         return meaning_words

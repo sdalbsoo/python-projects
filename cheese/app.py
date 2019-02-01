@@ -47,11 +47,11 @@ def subtitle_dictionary():
     word_meanings = None
     if subtitle_path is not None:
         with app.app_context():
-            conDB = get_db()
-            srt = SrtParser(subtitle_path, conDB)
+            con_db = get_db()
+            srt = SrtParser(subtitle_path, con_db)
             sentences = srt.extract_sentences()
             extracted_words = srt.extract_words(sentences)
-            word_meanings = srt.dict_parser.search_dict(extracted_words, conDB)  # noqa
+            word_meanings = srt.dict_parser.search_dict(extracted_words, con_db)  # noqa
     return render_template(
         "subtitle.html",
         path=subtitle_path,
@@ -69,14 +69,14 @@ def upload_file():
             file.save(path)
             return redirect(url_for("subtitle_dictionary", path=path))
         else:
-            return "Now llowed file"
+            return "Now allowed file"
     else:
         return "Something Wrong"
 
 
 def get_db():
     db = getattr(g, '_database', None)
-    print("connect DB!")
+    print("connect db!")
     with open("./config.yml", "r") as f:
         data_map = yaml.load(f)
         host = data_map["database"]["host"]

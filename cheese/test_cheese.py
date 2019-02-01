@@ -1,28 +1,20 @@
 from pathlib import Path
 
-import yaml
-
 from cheese import SubtitleParser
 from cheese import SrtParser
-from connectDB import ConnectDB
 import constants
-
-
-with open("./config.yml", "r") as f:
-    data_map = yaml.load(f)
-    HOST = data_map["database"]["host"]
-    USER = data_map["database"]["user"]
-    PW = data_map["database"]["password"]
+import app
 
 
 def test_srt_extract_meaning():
-    with ConnectDB(HOST, USER, PW) as conDB:  # noqa
-        conDB.cursor.execute("USE cheese_project")
-        srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), conDB)  # noqa
+    with app.app.app_context():
+        con_db = app.get_db()
+        cursor = con_db.cursor()
+        cursor.execute("USE cheese_project")
+        srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), con_db)  # noqa
         sentences = srt_parser.extract_sentences()
         words = srt_parser.extract_words(sentences)
-        words.pop("")
-        meanings = srt_parser.dict_parser.search_dict(words, conDB)
+        meanings = srt_parser.dict_parser.search_dict(words, con_db)
         answers = {
             'day': '1.날, 2.하루, 3.낮, 4.데이, 5.시절',
             'arrive': '1.도착하다, 2.오다, 3.가다, 4.도래하다, 5.도달하다',
@@ -36,11 +28,11 @@ def test_srt_extract_meaning():
 
 
 def test_srt_extract_words():
-    with ConnectDB(HOST, USER, PW) as conDB:  # noqa
-        srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), conDB)  # noqa
+    with app.app.app_context():
+        con_db = app.get_db()
+        srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), con_db)  # noqa
         sentences = srt_parser.extract_sentences()
         words = srt_parser.extract_words(sentences)
-        words.pop("")
         assert words == {
             "day": 1, "arrive": 1,
             "planet": 1, "blinking": 1,
@@ -49,8 +41,9 @@ def test_srt_extract_words():
 
 
 def test_srt_extract_sentence():
-    with ConnectDB(HOST, USER, PW) as conDB:  # noqa
-        srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), conDB)  # noqa
+    with app.app.app_context():
+        con_db = app.get_db()
+        srt_parser = SrtParser(constants.PATH_SRT / Path("lionking.srt"), con_db)  # noqa
         sentences = srt_parser.extract_sentences()
         assert sentences == [
             " from the day we arrive ",

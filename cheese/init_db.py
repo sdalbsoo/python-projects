@@ -1,10 +1,11 @@
-import connectDB
+import db
+import app
 
 
-def init_DB(app):
+def init_db():
     with app.app.app_context():
-        connectDB.create_table(app.get_db())
+        db.create_table(app.get_db())
 
 
-if __name__ == '__main__':
-    init_DB()
+if __name__ == "__main__":
+    init_db()
