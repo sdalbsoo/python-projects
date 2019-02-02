@@ -7,6 +7,7 @@ from flask import request
 from flask import redirect
 from flask import url_for
 from flask import g
+from flask import abort
 import yaml
 import pymysql
 
@@ -69,9 +70,15 @@ def upload_file():
             file.save(path)
             return redirect(url_for("subtitle_dictionary", path=path))
         else:
-            return "Now allowed file"
+            return page_not_found("unuseful file!")
     else:
-        return "Something Wrong"
+        return page_not_found("request method error!")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    app.logger.error("page not found: %s", (e))
+    return render_template("404.html"), 404
 
 
 def get_db():
