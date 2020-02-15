@@ -1,4 +1,4 @@
-'''programmers.co.kr/learn/challenges
+'''url: programmers.co.kr/learn/challenges
 문제: 완주하지 못한 선수
 해쉬 관련 문제
 '''
